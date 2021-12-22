@@ -41,4 +41,7 @@ function buildprofiles(;inputlist::String, orthoDBdir::String, outputdir::String
 
         write(o, "$(rprotein_name)\t$(og_name)\t$(min_bit)\n")
     end
+
+    close(f)
+    close(o)
 end
