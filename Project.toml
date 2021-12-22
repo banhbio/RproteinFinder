@@ -1,0 +1,10 @@
+name = "RproteinFinder"
+uuid = "9684f9c8-20f2-452e-841c-c248fa1ab5f7"
+authors = ["banhbio <ban@kuicr.kyoto-u.ac.jp>"]
+version = "0.1.0"
+
+[deps]
+BlastLCA = "59c79803-3a52-40d7-aec0-3a5c885b2802"
+FASTX = "c2308a5c-f048-11e8-3e8a-31650f418d12"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+Taxonomy = "10bb16a4-4bfc-432e-9419-4ca69c1a753c"
