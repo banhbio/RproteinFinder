@@ -99,7 +99,7 @@ function profilefromlist(path::String, hmmdir::String)
     return l
 end
 
-function Base.filter(v::Vector{FASTA.Record}, ts::Taxon, taxonomy::Taxonmy.DB, sqlite::SQLite.DB)
+function Base.filter(v::Vector{FASTA.Record}, ts::Taxon, taxonomy::Taxonomy.DB, sqlite::SQLite.DB)
     
     filtered_v = Vector{FASTA.Record}()
 
