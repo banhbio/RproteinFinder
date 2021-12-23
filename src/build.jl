@@ -46,7 +46,7 @@ function buildprofiles(;inputlist::String, orthoDBdir::String, outputdir::String
 end
 
 function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::Taxonomy.DB, taxid_sqlite::SQLite.DB, profilelist_path::String, hmmdir::String, outputdir::String, cpu::Int)
-    profilelist = profilefromlist(profilelist_path, hmmdir)
+    profilelist = profilefromlist(profilelist_path, hmmdir, 0.9)
 
     allfasta_path = joinpath(outputdir, "rproteins.fasta")
     allfasta_writer = open(FASTA.Writer, allfasta_path)
@@ -84,7 +84,7 @@ function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::
     close(allfasta_writer)    
 end
 
-function profilefromlist(path::String, hmmdir::String)
+function profilefromlist(path::String, hmmdir::String, threshold::Int=1)
     f = open(path, "r")
 
     l = Vector{Profile}()
@@ -92,7 +92,7 @@ function profilefromlist(path::String, hmmdir::String)
     for line in readline(f)
         (rprotein_name , og_name, minbit) = split(line, "\t")
         hmm_path = joinpath(hmmdir, og_name * ".hmm")
-        profile = Profile(rprotein_name, hmm_path, minbit)
+        profile = Profile(rprotein_name, hmm_path, minbit*threshold)
         push!(l, profile)
     end
 
