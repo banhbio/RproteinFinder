@@ -45,7 +45,7 @@ function buildprofiles(;inputlist::String, orthoDBdir::String, outputdir::String
     close(o)
 end
 
-function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxnomy::Taxonomy.DB, taxid_sqlite::SQLite.DB, profilelist_path::String, hmmdir::String, outputdir::String, cpu::Int)
+function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::Taxonomy.DB, taxid_sqlite::SQLite.DB, profilelist_path::String, hmmdir::String, outputdir::String, cpu::Int)
     profilelist = profilefromlist(profilelist_path, hmmdir)
 
     allfasta_path = joinpath(outputdir, "rproteins.fasta")
@@ -81,7 +81,7 @@ function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxnomy::T
 
         write(allfasta_writer, final_hits)
     end
-    close(allfasta_writer)
+    close(allfasta_writer)    
 end
 
 function profilefromlist(path::String, hmmdir::String)
