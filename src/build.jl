@@ -32,7 +32,7 @@ function buildprofiles(;inputlist::String, orthoDBdir::String, outputdir::String
         min = 0
         for l in readlines(t)
             bitscore = split(l, "\t")[6]
-            if bitscore > min
+            if bitscore < min
                 min = bitscore
             end
         end
