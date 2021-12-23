@@ -8,7 +8,7 @@ struct Profile <: AbstractData
     minbit::Float64
 end
 
-name(profile::Profile) = profile.name
+@inline name(profile::Profile) = profile.name
 @inline minbit(profile::Profile) = profile.minbit
 
 struct MSA <: AbstractData
