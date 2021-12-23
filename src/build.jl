@@ -45,7 +45,7 @@ function buildprofiles(;inputlist::String, orthoDBdir::String, outputdir::String
     close(o)
 end
 
-function builddatabase(; source_path::String, taxonomic_scope::Taxon, id2taxid_path::String, profilelist_path::String, hmmdir::String, outputdir::String, cpu::Int)
+function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxnomy::Taxonomy.DB, taxid_sqlite::SQLite.DB, profilelist_path::String, hmmdir::String, outputdir::String, cpu::Int)
     profilelist = profilefromlist(profilelist_path, hmmdir)
 
     allfasta_path = joinpath(outputdir, "rproteins.fasta")
@@ -69,9 +69,9 @@ function builddatabase(; source_path::String, taxonomic_scope::Taxon, id2taxid_p
 
         hits = [record for record in fasta_reader if (identifier(record) in hit_ids)]
         close(fasta_reader)
-        
 
-        euk_hits = filter(hits, taxonomic_scope)
+
+        euk_hits = filter(hits, taxonomic_scope, taxonomy, taxid_sqlite)
         final_hits = remove_2σ(euk_hits)
 
         fasta_path = joinpath(outputdir, name(profile) * ".fasta")
@@ -99,3 +99,41 @@ function profilefromlist(path::String, hmmdir::String)
     return l
 end
 
+function Base.filter(v::Vector{FASTA.Record}, ts::Taxon, taxonomy::Taxonmy.DB, sqlite::SQLite.DB)
+    
+    filtered_v = Vector{FASTA.Record}()
+
+    for record in v
+        taxid = get(sqlite, identifier(record), nothing)
+        
+        if taxid === nothing
+            @warn "record $(identifier(record)) has no taxid in $(sqlite.file)"
+            continue
+        end
+
+        taxon = get(taxid, taxonomy, nothing)
+
+        if taxon === nothing
+            @warn "There is no taxon correspondinig to $(taxid)!"
+            continue
+        end
+
+        if isdescendant(taxon, ts)
+            push!(filtered_v, record)
+        end
+    end
+
+    return filtered_v
+end
+
+function remove_2σ(v::Vector{FASTA.Record})
+    length_v = map(v, x -> seqlen(x))
+    μ = mean(length_v)
+    σ = std(length_v)
+
+    min_length = μ - 2σ
+    max_length = μ + 2σ
+
+    filtered_v = filter(v, x -> (seqlen(x) >= min_length) && (seqlen(x) <= max_length))
+    return filtered_v
+end
