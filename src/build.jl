@@ -57,20 +57,7 @@ function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::
         hmmserach = Hmmsearch(source_path, profile, tblout, cpu)
         run(hmmserach)
         
-        t = open(path(Tblout), "w")
-        fasta_reader = open(FASTA.Reader, source_path)
-
-        hit_ids = Vector{String}()
-        for l in readline(t)
-            hit_id = split(l, "\t")[1]
-            push!(hit_ids, hit_id)
-        end
-        close(t)
-
-        hits = [record for record in fasta_reader if (identifier(record) in hit_ids)]
-        close(fasta_reader)
-
-
+        hits = hits(tblout)
         euk_hits = filter(hits, taxonomic_scope, taxonomy, taxid_sqlite)
         final_hits = remove_2σ(euk_hits)
 
