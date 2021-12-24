@@ -1,4 +1,7 @@
 function findrproteins(;query::String, outputdir::String, profilelist_path::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_rank::Vector{Symbols}, blastlca_precision::Dict{Symbol, Float64})
+    mkpath(joinpath(outputdir,"hits"))
+    mkpath(joinpath(outputdir,"blastout"))
+    mkpath(joinpath(outputdir,"lca"))
 
     profilelist = profilefromlist(profilelist_path, hmmdir, 0.9)
 
@@ -30,5 +33,5 @@ function findrproteins(;query::String, outputdir::String, profilelist_path::Stri
                   method=fun,
                   header=false,
                   ranks=blastlca_rank)
-    end 
+    end
 end
