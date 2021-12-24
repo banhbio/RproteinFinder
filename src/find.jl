@@ -24,14 +24,22 @@ function findrproteins(;query::String, outputdir::String, profilelist_path::Stri
         run(blast)
         
         blastlca_path = joinpath(outputdir, "lca", name(profile) * ".tsv")
+        o = open(blastlca_path, "w")
         fun = x-> weightedLCA(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_presicion)
         
-        blastLCA(;filepath=path(blastout),
-                  outpath=blastlca_path,
+        lca_ch = blastLCA(path(blastout);
                   sqlite=taxid_db,
                   taxonomy=taxonomy,
                   method=fun,
                   header=false,
-                  ranks=blastlca_rank)
+                  ranks=blastlca_rank
+                  )
+        
+        for (qseqid, taxon, lineage) in lca_ch
+            id = taxid(taxon)
+            lineage_txt = sprint(io -> print_lineage(io, lineage))
+            write(o, "$(qseqid)\t$(name(profile))\t$(id)\t$(lineage_txt)\n")
+        end
+        close(o)
     end
 end
