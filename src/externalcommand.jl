@@ -39,3 +39,16 @@ function Hmmsearch(input::String, profile::Profile, result::Tblout, cpu::Int)
     cmd = `hmmsearch --tblout $(result) -T $(min) --cpu $(cpu) $(profile) $(input)`
     return Hmmsearch(cmd, cpu, input, result)
 end
+
+struct Blast <: AbstractData
+    cmd::Cmd
+    cpu::Int
+    input::String
+    db::String
+    result::Blastout
+end
+
+function Blast(input::String, db::String, output::Blastout, evalue::Float64, cpu::Int)
+    cmd = `diamond blastp --db $(db) --query $(input) --outfmt 6 --threads $(cpu) --evalue $(evalue) --out $(output)`
+    return Blast(cmd, cpu, input, db, result)
+end

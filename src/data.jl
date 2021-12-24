@@ -38,3 +38,12 @@ function hits(tblout::Tblout)
 
     return hits
 end
+
+struct Blastout <: AbstractData
+    path::String
+    query::String
+    subject::String
+end
+
+@inline query(blastout::Blastout) = blastout.query
+@inline subject(blastout::Blastout) = blastout.subject
