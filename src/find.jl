@@ -1,4 +1,4 @@
-function findrproteins(;query::String, outputdir::String, profilelist_path::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_rank::Vector{Symbols}, blastlca_precision::Dict{Symbol, Float64})
+function findrproteins(;query::String, outputdir::String, profilelist_path::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_rank::Vector{Symbol}, blastlca_precision::Dict{Symbol, Float64})
     mkpath(joinpath(outputdir,"hits"))
     mkpath(joinpath(outputdir,"blastout"))
     mkpath(joinpath(outputdir,"lca"))
@@ -25,7 +25,7 @@ function findrproteins(;query::String, outputdir::String, profilelist_path::Stri
         
         blastlca_path = joinpath(outputdir, "lca", name(profile) * ".tsv")
         o = open(blastlca_path, "w")
-        fun = x-> weightedLCA(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_presicion)
+        fun = x-> weightedLCA(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_precision)
         
         lca_ch = blastLCA(path(blastout);
                   sqlite=taxid_db,
