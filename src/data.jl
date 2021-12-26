@@ -23,7 +23,7 @@ end
 @inline fasta(tblout::Tblout) = tblout.fasta
 
 function hits(tblout::Tblout)
-    t = open(path(tblout), "w")
+    t = open(path(tblout), "r")
     fasta_reader = open(FASTA.Reader, fasta(Tblout))
 
     hit_ids = Vector{String}()
@@ -39,6 +39,20 @@ function hits(tblout::Tblout)
     return hits
 end
 
+function minbit(tblout::Tblout)
+    t = open(path(tblout), "r")
+
+    min = 0
+    for l in readlines(t)
+        bitscore = split(l, "\t")[6]
+        if bitscore < min
+            min = bitscore
+        end
+    end
+    close(t)
+
+    return min
+end
 struct Blastout <: AbstractData
     path::String
     query::String

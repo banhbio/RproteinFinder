@@ -3,6 +3,18 @@ abstract type AbstractExternalProgram end
 Base.run(ep::AbstractExternalProgram) = Base.run(ep.cmd)
 result(ep::AbstractExternalProgram) = run(ep.result)
 
+struct Cdhit <: AbstractExternalProgram
+    cmd::Cmd
+    cpu::Int
+    input::String
+    result::String
+end
+
+function Cdhit(input::String, result::String, cpu::Int, identity::Float64, coverage::Float64)
+    cmd = `cd-hit -T $(cpu) -M 16000 -c $(identity) -aS $(coverage) -aL $(coverage) -i $(input) -o $(result)`
+    return Cdhit(cmd, cpu, input, result)
+end
+
 struct Muscle <: AbstractExternalProgram
     cmd::Cmd
     cpu::Int
@@ -15,7 +27,7 @@ function Muscle(input::String, result::MSA, cpu::Int)
     return Muscle(cmd, cpu, input, result)
 end
 
-struct Hmmbuild<: AbstractExternalProgram
+struct Hmmbuild <: AbstractExternalProgram
     cmd::Cmd
     cpu::Int
     input::MSA
