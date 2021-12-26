@@ -1,6 +1,6 @@
 abstract type AbstractExternalProgram end
 
-run(ep::AbstractExternalProgram) = run(ep.cmd)
+Base.run(ep::AbstractExternalProgram) = Base.run(ep.cmd)
 result(ep::AbstractExternalProgram) = run(ep.result)
 
 struct Muscle <: AbstractExternalProgram
@@ -11,7 +11,7 @@ struct Muscle <: AbstractExternalProgram
 end
 
 function Muscle(input::String, result::MSA, cpu::Int)
-    cmd = `musle -align $(input) -output $(result) -threads $(cpu) -amino`
+    cmd = `muscle -align $(input) -output $(path(result)) -threads $(cpu) -amino`
     return Muscle(cmd, cpu, input, result)
 end
 
@@ -23,7 +23,7 @@ struct Hmmbuild<: AbstractExternalProgram
 end
 
 function Hmmbuild(input::MSA, result::Profile, cpu::Int)
-    cmd = `hmmbuild --amino --cpu $(cpu) $(result) $(input)`
+    cmd = `hmmbuild --amino --cpu $(cpu) $(path(result)) $(path(input))`
     return Hmmbuild(cmd, cpu, input, result)
 end
 
@@ -36,7 +36,7 @@ end
 
 function Hmmsearch(input::String, profile::Profile, result::Tblout, cpu::Int)
     min = minbit(profile)
-    cmd = `hmmsearch --tblout $(result) -T $(min) --cpu $(cpu) $(profile) $(input)`
+    cmd = `hmmsearch --tblout $(path(result)) -T $(min) --cpu $(cpu) $(path(profile)) $(input)`
     return Hmmsearch(cmd, cpu, input, result)
 end
 
@@ -49,6 +49,6 @@ struct Blast <: AbstractData
 end
 
 function Blast(input::String, db::String, output::Blastout, evalue::Float64, cpu::Int)
-    cmd = `diamond blastp --db $(db) --query $(input) --outfmt 6 --threads $(cpu) --evalue $(evalue) --out $(output)`
+    cmd = `diamond blastp --db $(db) --query $(input) --outfmt 6 --threads $(cpu) --evalue $(evalue) --out $(path(output))`
     return Blast(cmd, cpu, input, db, result)
 end
