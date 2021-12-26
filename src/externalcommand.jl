@@ -12,7 +12,7 @@ end
 
 function Muscle(input::String, result::MSA, cpu::Int)
     cmd = `musle -align $(input) -output $(result) -threads $(cpu) -amino`
-    return Musle(cmd, cpu, input, result)
+    return Muscle(cmd, cpu, input, result)
 end
 
 struct Hmmbuild<: AbstractExternalProgram
