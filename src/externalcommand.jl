@@ -49,7 +49,7 @@ end
 function Hmmsearch(input::String, profile::Profile, result::Tblout, cpu::Int)
     min = minbit(profile)
     cmd = `hmmsearch --tblout $(path(result)) -T $(min) --cpu $(cpu) $(path(profile)) $(input)`
-    return Hmmsearch(cmd, cpu, input, result)
+    return Hmmsearch(cmd, cpu, profile, result)
 end
 
 struct Blast <: AbstractData
