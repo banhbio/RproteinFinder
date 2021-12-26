@@ -3,7 +3,8 @@ function buildprofiles(;inputlist::String, orthoDBdir::String, outputdir::String
     f = open(inputlist, "r")
     o = open(profilelist, "w")
 
-
+    mkpath(outputdir)
+    
     for line in readlines(f)
         (rprotein_name, og_name) = split(line, "\t")
 
