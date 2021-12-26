@@ -42,13 +42,13 @@ end
 function minbit(tblout::Tblout)
     t = open(path(tblout), "r")
 
-    min = 0
+    min = Inf
     for l in readlines(t)
-        if l[1] == "#"
+        if l[1] == '#'
             continue
         end
 
-        bitscore = split(l, r" +")[6]
+        bitscore = parse(Float64, split(l, r" +")[6])
         if bitscore < min
             min = bitscore
         end
