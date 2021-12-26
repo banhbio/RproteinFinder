@@ -12,8 +12,8 @@ function buildprofiles(;inputlist::String, orthoDBdir::String, outputdir::String
         msa_path = joinpath(outputdir, og_name * ".msa")
         msa = MSA(msa_path)
 
-        musle = Musle(fa, msa, cpu)
-        run(musle)
+        muscle = Muscle(fa, msa, cpu)
+        run(muscle)
 
         profile_path = joinpath(outputdir, og_name * ".hmm")
         profile = Profile(og_name, profile_path, 0)

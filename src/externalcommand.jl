@@ -3,14 +3,14 @@ abstract type AbstractExternalProgram end
 run(ep::AbstractExternalProgram) = run(ep.cmd)
 result(ep::AbstractExternalProgram) = run(ep.result)
 
-struct Musle <: AbstractExternalProgram
+struct Muscle <: AbstractExternalProgram
     cmd::Cmd
     cpu::Int
     input::String
     result::MSA
 end
 
-function Musle(input::String, result::MSA, cpu::Int)
+function Muscle(input::String, result::MSA, cpu::Int)
     cmd = `musle -align $(input) -output $(result) -threads $(cpu) -amino`
     return Musle(cmd, cpu, input, result)
 end
