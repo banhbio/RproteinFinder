@@ -1,4 +1,4 @@
-using Rproteins
+using RproteinFinder
 
 using Logging
 using ArgParse: ArgParseSettings, parse_args, @add_arg_table
@@ -77,3 +77,5 @@ function main()
                                    cluster_identity=identity,
                                    cluster_coverage=coverage)
 end
+
+main()
