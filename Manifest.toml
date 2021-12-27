@@ -54,7 +54,7 @@ version = "4.0.4"
 deps = ["DataStructures", "SQLite", "Taxonomy"]
 git-tree-sha1 = "f9e9526eebddee99a50da8ab8d6a8432352c30a0"
 repo-rev = "main"
-repo-url = "git@github.com:banhbio/BlastLCA.jl.git"
+repo-url = "https://github.com/banhbio/BlastLCA.jl.git"
 uuid = "59c79803-3a52-40d7-aec0-3a5c885b2802"
 version = "0.1.0"
 
