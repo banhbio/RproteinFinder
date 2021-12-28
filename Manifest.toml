@@ -52,7 +52,7 @@ version = "4.0.4"
 
 [[BlastLCA]]
 deps = ["DataStructures", "SQLite", "Taxonomy"]
-git-tree-sha1 = "f9e9526eebddee99a50da8ab8d6a8432352c30a0"
+git-tree-sha1 = "43e180a00bb4caa87a6cc3c9db7438b24168be44"
 repo-rev = "main"
 repo-url = "https://github.com/banhbio/BlastLCA.jl.git"
 uuid = "59c79803-3a52-40d7-aec0-3a5c885b2802"
@@ -225,9 +225,11 @@ version = "3.3.1"
 
 [[SQLite]]
 deps = ["BinaryProvider", "DBInterface", "Dates", "Libdl", "Random", "SQLite_jll", "Serialization", "Tables", "Test", "WeakRefStrings"]
-git-tree-sha1 = "ff81f9a47cbfaad52693ce0c74bbd86f2166f64d"
+git-tree-sha1 = "18099bdcbc5809982b06f05dfa1e4aebf8de26c0"
+repo-rev = "master"
+repo-url = "https://github.com/JuliaDatabases/SQLite.jl.git"
 uuid = "0aa819cd-b072-5ff4-a722-6bc24af294d9"
-version = "1.3.0"
+version = "1.4.0"
 
 [[SQLite_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]

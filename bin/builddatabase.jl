@@ -18,11 +18,6 @@ function parse_commandline()
             help = "input protein file (fasta format)"
             arg_type = AbstractString
             required = true
-        
-        "--taxonomy"
-            help = "taxonomy databse directory"
-            arg_type = AbstractString
-            required = true
 
         "--taxonomy_db"
             help = "taxonomy database (directory where nodes.dmp and names.dmp)"
