@@ -54,6 +54,7 @@ end
 function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::Taxonomy.DB, taxid_sqlite::SQLite.DB, profilelist_path::String, hmmdir::String, outputdir::String, cpu::Int)
     profilelist = profilefromlist(profilelist_path, hmmdir, 0.9)
 
+    mkpath(outputdir)
     allfasta_path = joinpath(outputdir, "rproteins.fasta")
     allfasta_writer = open(FASTA.Writer, allfasta_path)
     for profile in profilelist

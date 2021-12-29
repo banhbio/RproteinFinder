@@ -68,7 +68,7 @@ function main()
 
     outputdir = abspath(parsed_args["outputdir"])
 
-    @assert isfile(parse_args["profilelist"])
+    @assert isfile(parsed_args["profilelist"])
     profilelist = abspath(parsed_args["profilelist"])
 
     taxonomy = Taxonomy.DB(taxonomy_db, "nodes.dmp","names.dmp")

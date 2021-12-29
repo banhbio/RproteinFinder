@@ -1,12 +1,12 @@
-function profilefromlist(path::String, hmmdir::String, threshold::Int=1)
+function profilefromlist(path::String, hmmdir::String, threshold::Float64=1)
     f = open(path, "r")
 
     l = Vector{Profile}()
 
-    for line in readline(f)
+    for line in readlines(f)
         (rprotein_name , og_name, minbit) = split(line, "\t")
         hmm_path = joinpath(hmmdir, og_name * ".hmm")
-        profile = Profile(rprotein_name, hmm_path, minbit*threshold)
+        profile = Profile(rprotein_name, hmm_path, parse(Float64, minbit)*threshold)
         push!(l, profile)
     end
 
