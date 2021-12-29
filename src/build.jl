@@ -54,28 +54,33 @@ end
 function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::Taxonomy.DB, taxid_sqlite::SQLite.DB, profilelist_path::String, hmmdir::String, outputdir::String, cpu::Int)
     profilelist = profilefromlist(profilelist_path, hmmdir, 0.9)
 
-    mkpath(outputdir)
-    allfasta_path = joinpath(outputdir, "rproteins.fasta")
+    tblout_dir = joinpath(outputdir, "tblout")
+    fastaout_dir = joinpath(outputdir, "fasta")
+    mkpath(tblout_dir)
+    mkpath(fastaout_dir)
+
+    allfasta_path = joinpath(fastaout_dir, "rproteins.fasta")
     allfasta_writer = open(FASTA.Writer, allfasta_path)
     for profile in profilelist
-        tblout_path = joinpath(outputdir, name(profile) * ".tbl")
+        tblout_path = joinpath(tblout_dir, name(profile) * ".tbl")
         tblout = Tblout(tblout_path, source_path)
 
         hmmserach = Hmmsearch(source_path, profile, tblout, cpu)
         run(hmmserach)
         
-        hits = hits(tblout)
-        euk_hits = filter(hits, taxonomic_scope, taxonomy, taxid_sqlite)
+        hits_fasta = hits(tblout)
+        euk_hits = filter(hits_fasta, taxonomic_scope, taxonomy, taxid_sqlite)
         final_hits = remove_2σ(euk_hits)
 
-        fasta_path = joinpath(outputdir, name(profile) * ".fasta")
+        fasta_path = joinpath(fastaout_dir, name(profile) * ".fasta")
         fasta_writer = open(FASTA.Writer, fasta_path)
+
         for hit in final_hits
             write(fasta_writer, hit)
+            write(allfasta_writer, hit)
         end
         close(fasta_writer)
 
-        write(allfasta_writer, final_hits)
     end
     close(allfasta_writer)    
 end

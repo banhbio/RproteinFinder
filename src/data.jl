@@ -24,11 +24,15 @@ end
 
 function hits(tblout::Tblout)
     t = open(path(tblout), "r")
-    fasta_reader = open(FASTA.Reader, fasta(Tblout))
+    fasta_reader = open(FASTA.Reader, fasta(tblout))
 
     hit_ids = Vector{String}()
-    for l in readline(t)
-        hit_id = split(l, "\t")[1]
+    for l in eachline(t)
+        if l[1] == '#'
+            continue
+        end
+
+        hit_id = split(l, r" +")[1]
         push!(hit_ids, hit_id)
     end
 
@@ -43,7 +47,7 @@ function minbit(tblout::Tblout)
     t = open(path(tblout), "r")
 
     min = Inf
-    for l in readlines(t)
+    for l in eachline(t)
         if l[1] == '#'
             continue
         end
