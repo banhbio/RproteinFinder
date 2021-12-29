@@ -24,7 +24,6 @@ end
 
 function hits(tblout::Tblout)
     t = open(path(tblout), "r")
-    fasta_reader = open(FASTA.Reader, fasta(tblout))
 
     hit_ids = Vector{String}()
     for l in eachline(t)
