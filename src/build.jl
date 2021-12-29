@@ -55,12 +55,13 @@ function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::
     profilelist = profilefromlist(profilelist_path, hmmdir, 0.9)
 
     tblout_dir = joinpath(outputdir, "tblout")
-    fastaout_dir = joinpath(outputdir, "fasta")
     mkpath(tblout_dir)
-    mkpath(fastaout_dir)
 
-    allfasta_path = joinpath(fastaout_dir, "rproteins.fasta")
-    allfasta_writer = open(FASTA.Writer, allfasta_path)
+    result_dir = joinpath(outputdir, "fasta")
+    mkpath(result_dir)
+    result_file = joinpath(result_dir, "rproteins.tsv")
+    f = open(result_file, "w")
+
     for profile in profilelist
         tblout_path = joinpath(tblout_dir, name(profile) * ".tbl")
         tblout = Tblout(tblout_path, source_path)
@@ -68,19 +69,27 @@ function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::
         hmmserach = Hmmsearch(source_path, profile, tblout, cpu)
         run(hmmserach)
         
-        hits_fasta = hits(tblout)
-        euk_hits = filter(hits_fasta, taxonomic_scope, taxonomy, taxid_sqlite)
-        final_hits = remove_2σ(euk_hits)
+        hits_id = hits(tblout)
+        euk_hits = filter(hits_id) do x
+            taxid = get(taxid_sqlite, x, nothing)
+        
+            if taxid === nothing
+                @warn "record $(identifier(record)) has no taxid in $(taid_sqlite.file)"
+                return false
+            end
 
-        fasta_path = joinpath(fastaout_dir, name(profile) * ".fasta")
-        fasta_writer = open(FASTA.Writer, fasta_path)
+            taxon = get(taxid, taxonomy, nothing)
 
-        for hit in final_hits
-            write(fasta_writer, hit)
-            write(allfasta_writer, hit)
+            if taxon === nothing
+                @warn "There is no taxon correspondinig to $(taxid)!"
+                return false
+            end
+
+            return isdescendant(taxon, taxonomic_scope)
         end
-        close(fasta_writer)
 
+        for hit in euk_hits
+            write(f,  "$(hit)¥t$(name(profile))¥n")
+        end
     end
-    close(allfasta_writer)    
 end

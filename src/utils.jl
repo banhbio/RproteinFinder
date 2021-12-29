@@ -13,33 +13,6 @@ function profilefromlist(path::String, hmmdir::String, threshold::Float64=1)
     return l
 end
 
-function Base.filter(v::Vector{FASTA.Record}, ts::Taxon, taxonomy::Taxonomy.DB, sqlite::SQLite.DB)
-    
-    filtered_v = Vector{FASTA.Record}()
-
-    for record in v
-        taxid = get(sqlite, identifier(record), nothing)
-        
-        if taxid === nothing
-            @warn "record $(identifier(record)) has no taxid in $(sqlite.file)"
-            continue
-        end
-
-        taxon = get(taxid, taxonomy, nothing)
-
-        if taxon === nothing
-            @warn "There is no taxon correspondinig to $(taxid)!"
-            continue
-        end
-
-        if isdescendant(taxon, ts)
-            push!(filtered_v, record)
-        end
-    end
-
-    return filtered_v
-end
-
 function remove_2σ(v::Vector{FASTA.Record})
     length_v = map(x -> FASTA.seqlen(x), v)
     μ = mean(length_v)

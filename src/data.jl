@@ -35,12 +35,9 @@ function hits(tblout::Tblout)
         hit_id = split(l, r" +")[1]
         push!(hit_ids, hit_id)
     end
-
-    hits = [record for record in fasta_reader if (identifier(record) in hit_ids)]
     close(t)
-    close(fasta_reader)
 
-    return hits
+    return hit_ids
 end
 
 function minbit(tblout::Tblout)
