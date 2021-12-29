@@ -70,26 +70,26 @@ function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::
         run(hmmserach)
         
         hits_id = hits(tblout)
-        euk_hits = filter(hits_id) do x
-            taxid = get(taxid_sqlite, x, nothing)
+        for hit in hits_id
+            taxid = get(taxid_sqlite, hit, nothing)
         
             if taxid === nothing
-                @warn "record $(identifier(record)) has no taxid in $(taid_sqlite.file)"
-                return false
+                @warn "record $(hit) has no taxid in $(taxid_sqlite.file)"
+                continue
             end
 
             taxon = get(taxid, taxonomy, nothing)
 
             if taxon === nothing
                 @warn "There is no taxon correspondinig to $(taxid)!"
-                return false
+                continue
             end
 
-            return isdescendant(taxon, taxonomic_scope)
-        end
-
-        for hit in euk_hits
-            write(f,  "$(hit)¥t$(name(profile))¥n")
+            if isdescendant(taxon, taxonomic_scope)
+                write(f,  "$(hit)¥t$(name(profile))¥n")
+            end
         end
     end
+
+    close(f)
 end
