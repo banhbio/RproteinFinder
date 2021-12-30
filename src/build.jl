@@ -86,7 +86,7 @@ function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::
             end
 
             if isdescendant(taxon, taxonomic_scope)
-                write(f,  "$(hit)¥t$(name(profile))¥n")
+                write(f,  "$(hit)\t$(name(profile))\n")
             end
         end
     end
