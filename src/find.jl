@@ -3,18 +3,25 @@ function findrproteins(;query::String, outputdir::String, profilelist_path::Stri
     mkpath(joinpath(outputdir,"blastout"))
     mkpath(joinpath(outputdir,"lca"))
 
+    @info "Start Rproteinfinder.jl to find rproteins"
     profilelist = profilefromlist(profilelist_path, hmmdir, 0.9)
 
     for profile in profilelist
+        @info "Starting with $profile"
         tblout_path = joinpath(outputdir, "hits", name(profile) * ".tbl")
         tblout = Tblout(tblout_path, query)
 
+        @info "@$(profile)\tRunning hmmsearch"
         hmmserach = Hmmsearch(query, profile, tblout, cpu)
         run(hmmserach)
 
         hit_id = hits(tblout)
-        isempty(hit_id) ? continue : nothing
+        if isempty(hit_id)
+            @info "@$(profile)\tThere is no hmmsearch hit in $(fasta(tblout))"
+            continue
+        end
 
+        @info "@$(profile)\tWriting hmmsearch hits to .fasta file"
         hits_path = joinpath(outputdir, "hits" , name(profile) * ".fasta")
         writer = open(FASTA.Writer, hits_path)
         reader = open(FASTA.Reader, fasta(tblout))
@@ -26,6 +33,7 @@ function findrproteins(;query::String, outputdir::String, profilelist_path::Stri
         close(writer)
         close(reader)
 
+        @info "@$(profile)\tRunning diamond blastp"
         blastout_path = joinpath(outputdir, "blastout", name(profile) * ".tsv")
         blastout = Blastout(blastout_path, hits_path, db_path)
 
@@ -35,11 +43,15 @@ function findrproteins(;query::String, outputdir::String, profilelist_path::Stri
         blastlca_path = joinpath(outputdir, "lca", name(profile) * ".tsv")
         o = open(blastlca_path, "w")
 
-        filesize(path(blastout)) == 0 ? continue : nothing
+        if filesize(path(blastout)) == 0
+            @info "@$(profile)\tThere is no diamond blastp hit in $(db_path)"
+            continue
+        end
+
         f = open(path(blastout), "r")
-
         fun = x-> weightedLCA(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_precision)
-
+        @info "@$(profile)\tRunning blastLCA"
+        
         lca_ch = blastLCA(f;
                   sqlite=taxid_db,
                   taxonomy=taxonomy,
