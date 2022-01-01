@@ -1,4 +1,6 @@
 using RproteinFinder
+using Taxonomy
+using SQLite
 
 using Logging
 using ArgParse: ArgParseSettings, parse_args, @add_arg_table
@@ -16,14 +18,14 @@ function parse_commandline()
             help = "input og list file (tsv format)"
             arg_type = AbstractString
             required = true
-        
-        "--orthoDBdir"
-            help = "orthoDB directory"
-            arg_type = AbstractString
-            required = true
 
         "--outputdir"
             help = "output directory"
+            arg_type = AbstractString
+            required = true
+            
+        "--db_path"
+            help = "rproteins database"
             arg_type = AbstractString
             required = true
         
@@ -32,15 +34,21 @@ function parse_commandline()
             arg_type = AbstractString
             required = true
 
-        "--identity"
-            help = "identity used in cd-hit"
-            arg_type = Float64
+        "--taxonomy_db"
+            help = "taxonomy database (directory where nodes.dmp and names.dmp)"
+            arg_type = AbstractString
+            required = true
+        
+        "--seq2taxonomy_db"
+            help = "seq2taxonomy seqlite database"
+            arg_type = AbstractString
+            required = true
+        
+        "--hmmdir"
+            help = "hmm profile directory"
+            arg_type = AbstractString
             required = true
 
-        "--coverage"
-            help = "coverage used in cd-hit"
-            arg_type = Float64
-            required = true
     end
 
     return parse_args(s)
@@ -72,6 +80,10 @@ function main()
 
     outputdir = abspath(parsed_args["outputdir"])
 
+
+    taxonomy = Taxonomy.DB(taxonomy_db, "nodes.dmp","names.dmp")
+    sqlite = SQLite.DB(seq2taxonomy_db)
+
     minimal = 0.9
     cutoff = 0.8
     ranks =[:superkingdom, :phylum, :class, :order, :family, :genus, :species]
@@ -89,13 +101,13 @@ function main()
                                 outputdir=outputdir,
                                 profilelist_path=profilelist,
                                 db_path=db,
-                                taxonomy=taxonomy_db,
-                                taxid_db=seq2taxonomy_db,
+                                taxonomy=taxonomy,
+                                taxid_db=sqlite,
                                 hmmdir=hmmdir,
                                 cpu=thread,
                                 blastlca_minimal=minimal,
                                 blastlca_cutoff=cutoff,
-                                blastlca_rank=rank,
+                                blastlca_ranks=ranks,
                                 blastlca_precision=precision)
 end
 

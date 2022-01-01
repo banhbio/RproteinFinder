@@ -52,7 +52,7 @@ function Hmmsearch(input::String, profile::Profile, result::Tblout, cpu::Int)
     return Hmmsearch(cmd, cpu, profile, result)
 end
 
-struct Blast <: AbstractData
+struct Blast <: AbstractExternalProgram
     cmd::Cmd
     cpu::Int
     input::String
@@ -62,5 +62,5 @@ end
 
 function Blast(input::String, db::String, output::Blastout, evalue::Float64, cpu::Int)
     cmd = `diamond blastp --db $(db) --query $(input) --outfmt 6 --threads $(cpu) --evalue $(evalue) --out $(path(output))`
-    return Blast(cmd, cpu, input, db, result)
+    return Blast(cmd, cpu, input, db, output)
 end
