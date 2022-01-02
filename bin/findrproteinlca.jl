@@ -60,22 +60,22 @@ function main()
     thread = parsed_args["thread"]
     @assert thread > 0
 
-    @assert isfile(parsed_args["input"])
+    @assert isfile(realpath(parsed_args["input"]))
     input = abspath(parsed_args["input"])
 
-    @assert isfile(parsed_args["profilelist"])
+    @assert isfile(realpath(parsed_args["profilelist"]))
     profilelist = abspath(parsed_args["profilelist"])
 
-    @assert isfile(parsed_args["db_path"])
+    @assert isfile(realpath(parsed_args["db_path"]))
     db = abspath(parsed_args["db_path"])
 
-    @assert isdir(parsed_args["taxonomy_db"])
+    @assert isdir(realpath(parsed_args["taxonomy_db"]))
     taxonomy_db = abspath(parsed_args["taxonomy_db"])
 
-    @assert isfile(parsed_args["seq2taxonomy_db"])
+    @assert isfile(realpath(parsed_args["seq2taxonomy_db"]))
     seq2taxonomy_db = abspath(parsed_args["seq2taxonomy_db"])
 
-    @assert isdir(parsed_args["hmmdir"])
+    @assert isdir(realpath(parsed_args["hmmdir"]))
     hmmdir = abspath(parsed_args["hmmdir"])
 
     outputdir = abspath(parsed_args["outputdir"])
@@ -94,7 +94,7 @@ function main()
                :genus => 0.95,
                :species => 1.0)
 
-    @info "Parsed args:" thread input profilelist outputdir db taxonomy_db seq2taxonomy_db hmmdir minimal cutoff ranks presicion
+    @info "Parsed args:" thread input profilelist outputdir db taxonomy_db seq2taxonomy_db hmmdir minimal cutoff ranks precision
 
     
     RproteinFinder.findrproteins(;query=input,
