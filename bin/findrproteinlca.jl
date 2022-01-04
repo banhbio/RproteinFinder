@@ -15,12 +15,17 @@ function parse_commandline()
             default = 1
         
         "--input", "-i"
-            help = "input og list file (tsv format)"
+            help = "input fasta file"
+            arg_type = AbstractString
+            required = true
+    
+        "--output", "-o"
+            help = "output file (tsv format)"
             arg_type = AbstractString
             required = true
 
-        "--outputdir"
-            help = "output directory"
+        "--tempdir"
+            help = "temp directory"
             arg_type = AbstractString
             required = true
             
@@ -78,8 +83,8 @@ function main()
     @assert isdir(realpath(parsed_args["hmmdir"]))
     hmmdir = abspath(parsed_args["hmmdir"])
 
-    outputdir = abspath(parsed_args["outputdir"])
-
+    tempdir = abspath(parsed_args["tempdir"])
+    output = abspath(parsed_args["output"])
 
     taxonomy = Taxonomy.DB(taxonomy_db, "nodes.dmp","names.dmp")
     sqlite = SQLite.DB(seq2taxonomy_db)
@@ -94,11 +99,12 @@ function main()
                :genus => 0.95,
                :species => 1.0)
 
-    @info "Parsed args:" thread input profilelist outputdir db taxonomy_db seq2taxonomy_db hmmdir minimal cutoff ranks precision
+    @info "Parsed args:" thread input output profilelist tempdir db taxonomy_db seq2taxonomy_db hmmdir minimal cutoff ranks precision
 
     
     RproteinFinder.findrproteins(;query=input,
-                                outputdir=outputdir,
+                                output=output,
+                                tempdir=tempdir,
                                 profilelist_path=profilelist,
                                 db_path=db,
                                 taxonomy=taxonomy,

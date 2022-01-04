@@ -1,12 +1,12 @@
-function findrproteins(;query::String, outputdir::String, profilelist_path::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_ranks::Vector{Symbol}, blastlca_precision::Dict{Symbol, Float64})
-    mkpath(joinpath(outputdir,"hits"))
+function findrproteins(;query::String, output::String, tempdir::String, profilelist_path::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_ranks::Vector{Symbol}, blastlca_precision::Dict{Symbol, Float64})
+    mkpath(joinpath(tempdir,"hits"))
     
     @info "Start Rproteinfinder.jl to find rproteins"
     profilelist = profilefromlist(profilelist_path, hmmdir, 0.9)
 
     for profile in profilelist
         @info "Starting with $profile"
-        tblout_path = joinpath(outputdir, "hits", name(profile) * ".tbl")
+        tblout_path = joinpath(tempdir, "hits", name(profile) * ".tbl")
         tblout = Tblout(tblout_path, query)
 
         @info "@$(profile)\tRunning hmmsearch"
@@ -18,7 +18,7 @@ function findrproteins(;query::String, outputdir::String, profilelist_path::Stri
     allhits = String[]
     for profile in profilelist
         @info "@$(profile)\tWriting hmmsearch hits to .fasta file"
-        tblout_path = joinpath(outputdir, "hits", name(profile) * ".tbl")
+        tblout_path = joinpath(tempdir, "hits", name(profile) * ".tbl")
         tblout = Tblout(tblout_path, query)
         hitid = hits(tblout)
         for hit in hitid
@@ -32,7 +32,7 @@ function findrproteins(;query::String, outputdir::String, profilelist_path::Stri
         end
     end
     
-    hits_path = joinpath(outputdir, "hits.fasta")
+    hits_path = joinpath(tempdir, "hits.fasta")
     writer = open(FASTA.Writer, hits_path)
     reader = open(FASTA.Reader, query)
     for record in reader
@@ -44,14 +44,13 @@ function findrproteins(;query::String, outputdir::String, profilelist_path::Stri
     close(reader)
 
     @info "Running diamond blastp"
-    blastout_path = joinpath(outputdir, "blastout.tsv")
+    blastout_path = joinpath(tempdir, "blastout.tsv")
     blastout = Blastout(blastout_path, hits_path, db_path)
 
     blast = Blast(hits_path, db_path, blastout, 1e-05, cpu)
     run(blast)
-        
-    blastlca_path = joinpath(outputdir, "lca.tsv")
-    o = open(blastlca_path, "w")
+
+    o = open(output, "w")
 
     if filesize(path(blastout)) == 0
         @info "There is no diamond blastp hit in $(db_path)"
