@@ -9,4 +9,4 @@ module load diamond/2.0.11
 module load hmmer/3.3.2
 module load julia/1.6.2
 
-julia --project=@. bin/findrproteinlca.jl -t 8 -i test/MMETSP0907.trinity_out_2.2.0.Trinity.fasta.transdecoder.pep.rename.fasta --outputdir ./test --profilelist ./data/profile_list.tsv --db_path ./data/fasta/rproteins.fasta --taxonomy_db ./data/taxonomy --seq2taxonomy_db ./data/fasta/rproteins.taxid.db --hmmdir ./data/profile/
+julia --project=@. bin/findrproteinlca.jl -t 8 -i test/MMETSP0907.trinity_out_2.2.0.Trinity.fasta.transdecoder.pep.rename.fasta --outputdir ./test --profilelist ./data/profile_list.tsv --db_path ./data/uniref/uniref100 --taxonomy_db ./data/taxonomy --seq2taxonomy_db ./data/uniref/uniref100.taxid.db --hmmdir ./data/profile
