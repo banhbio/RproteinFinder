@@ -8,4 +8,4 @@ OUTPUT=$2
 TEMP=$3
 CPU=$4
 
-julia --project="$SCRIPTPATH" $SCRIPTPATH/bin/findrproteinlca.jl -t $CPU -i $QUERY -o $OUTPUT --tempdir $TEMP --profilelist $SCRIPTPATH/data/profile_list.tsv --db_path $SCRIPTPATH/data/fasta/rproteins.fasta --taxonomy_db $SCRIPTPATH/data/taxonomy --seq2taxonomy_db $SCRIPTPATH/data/fasta/rproteins.taxid.db --hmmdir ./data/profile
+julia --project="$SCRIPTPATH" $SCRIPTPATH/bin/findrproteinlca.jl -t $CPU -i $QUERY -o $OUTPUT --tempdir $TEMP --profilelist $SCRIPTPATH/data/profile_list.tsv --db_path $SCRIPTPATH/data/fasta/rproteins.fasta --taxonomy_db $SCRIPTPATH/data/taxonomy --seq2taxonomy_db $SCRIPTPATH/data/fasta/rproteins.taxid.db --hmmdir $SCRIPTPATH/data/profile
