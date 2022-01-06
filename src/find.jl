@@ -27,7 +27,7 @@ function findrproteins(;query::String, output::String, tempdir::String, profilel
         end
         append!(allhits, hitid)
         if isempty(hitid)
-            @info "@$(profile)\tThere is no hmmsearch hit in $(fasta(tblout))"
+            @info "@$(profile)\tThere is no hmmsearch hit in $(query)"
             continue
         end
     end
@@ -42,6 +42,11 @@ function findrproteins(;query::String, output::String, tempdir::String, profilel
     end
     close(writer)
     close(reader)
+    
+    if filesize(hits_path) == 0
+        @info "@all There is no hmmserach hit in $(query)"
+        return
+    end
 
     @info "Running diamond blastp"
     blastout_path = joinpath(tempdir, "blastout.tsv")
