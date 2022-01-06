@@ -2,7 +2,7 @@ function findrproteins(;query::String, output::String, tempdir::String, profilel
     mkpath(joinpath(tempdir,"hits"))
     touch(output)
 
-    if filesize(query)
+    if filesize(query) == 0
         @info "$(query) is empty"
         return
     end  
