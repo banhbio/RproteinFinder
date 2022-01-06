@@ -77,7 +77,8 @@ function findrproteins(;query::String, output::String, tempdir::String, profilel
               taxonomy=taxonomy,
               method=fun,
               header=false,
-              ranks=blastlca_ranks
+              ranks=blastlca_ranks,
+              rmselfhit=true
               )
 
     for (qseqid, taxon, lineage) in lca_ch
