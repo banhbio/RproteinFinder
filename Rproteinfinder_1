@@ -1,0 +1,11 @@
+#!/bin/bash -eu
+
+SCRIPT=$(readlink -f "$0")
+SCRIPTPATH=$(dirname "$SCRIPT")
+
+QUERY=$1
+OUTPUT=$2
+TEMP=$3
+CPU=$4
+
+julia --project="$SCRIPTPATH" $SCRIPTPATH/bin/findrproteinlca.jl -t $CPU -i $QUERY -o $OUTPUT --tempdir $TEMP --profilelist $SCRIPTPATH/data/profile_list.tsv --db_path $SCRIPTPATH/data_merge/fasta/rproteins.fasta --taxonomy_db $SCRIPTPATH/data/taxonomy --seq2taxonomy_db $SCRIPTPATH/data_merge/fasta/rproteins.taxid.db --hmmdir $SCRIPTPATH/data/profile
