@@ -1,6 +1,11 @@
 function findrproteins(;query::String, output::String, tempdir::String, profilelist_path::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_ranks::Vector{Symbol}, blastlca_precision::Dict{Symbol, Float64})
     mkpath(joinpath(tempdir,"hits"))
     touch(output)
+
+    if filesize(query)
+        @info "$(query) is empty"
+        return
+    end  
     
     @info "Start Rproteinfinder.jl to find rproteins"
     profilelist = profilefromlist(profilelist_path, hmmdir, 0.9)
