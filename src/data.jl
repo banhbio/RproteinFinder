@@ -57,6 +57,24 @@ function minbit(tblout::Tblout)
 
     return min
 end
+
+function bitscores(tblout::Tblout)
+    t = open(path(tblout), "r")
+
+    bitscores = Float64[]
+    for l in eachline(t)
+        if l[1] == '#'
+            continue
+        end
+
+        bitscore = parse(Float64, split(l, r" +")[6])
+        push!(bitscores, bitscore)
+    end
+    close(t)
+    
+    return bitscores
+end
+
 struct Blastout <: AbstractData
     path::String
     query::String
