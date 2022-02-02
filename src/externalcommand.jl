@@ -64,3 +64,14 @@ function Blast(input::String, db::String, output::Blastout, evalue::Float64, cpu
     cmd = `diamond blastp --db $(db) --query $(input) --outfmt 6 --threads $(cpu) --evalue $(evalue) -k 500 --out $(path(output))`
     return Blast(cmd, cpu, input, db, output)
 end
+
+struct Trimal <: AbstractExternalProgram
+    cmd::Cmd
+    input::String
+    output::String
+end
+
+function Trimal(input::String, output::String)
+    cmd = `trimal -in $(input) -out $(output) -resoverlap 75 -seqoverlap 0.75`
+    return Trimal(cmd, input, output)
+end
