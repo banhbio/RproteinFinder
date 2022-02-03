@@ -76,6 +76,15 @@ function main()
                                    cpu=thread,
                                    cluster_identity=identity,
                                    cluster_coverage=coverage)
+
+    RproteinFinder.makeadaptivethreshold(; inputlist=input,
+                                           orthoDBdir=orthoDBdir,
+                                           outputdir=outputdir,
+                                           profilelist=profilelist,
+                                           cpu=thread,
+                                           cluster_identity=identity,
+                                           cluster_coverage=coverage)
+    
 end
 
 main()

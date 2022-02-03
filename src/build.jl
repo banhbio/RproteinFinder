@@ -183,7 +183,7 @@ function builddatabase(; source_path::String, taxonomic_scope::Taxon, taxonomy::
                 continue
             end
 
-            taxon = get(taxid, taxonomy, nothing)
+            taxon = get(taxonomy, taxid, nothing)
 
             if taxon === nothing
                 @warn "There is no taxon correspondinig to $(taxid)!"
