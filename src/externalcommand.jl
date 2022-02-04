@@ -3,56 +3,41 @@ abstract type AbstractExternalProgram end
 Base.run(ep::AbstractExternalProgram) = Base.run(ep.cmd)
 result(ep::AbstractExternalProgram) = run(ep.result)
 
-struct Cdhit <: AbstractExternalProgram
+
+struct Kofamscan <: AbstractExternalProgram
     cmd::Cmd
     cpu::Int
     input::String
-    result::String
+    config::String
+    result::Kofamout
 end
 
-function Cdhit(input::String, result::String, cpu::Int, identity::Float64, coverage::Float64)
-    cmd = `cd-hit -T $(cpu) -M 16000 -c $(identity) -aS $(coverage) -aL $(coverage) -i $(input) -o $(result)`
-    return Cdhit(cmd, cpu, input, result)
+function Kofamscan(input::String, output_dir::String, namae::String, profile_dir::Srtring, ko_list::String, hmmsearch_path::String, paralell_path::String, cpu::Int)
+    config = kofamconfig!(profile_dir, ko_list, hmmsearch_path, paralell_path, output_dir)
+    tmp_dir = joinpath(out_dir, "tmp")
+    mkpath(tmp_dir)
+    output = joinpath(out_dir, "$(namae).kofam.tblout")
+    cmd = `exec_annotation -o $(output) --cpu=$(cpu) -c $(config) $(input)`
+    kofamout = Kofamout(input, output, config)
+    return Kofamscan(cmd, cpu, input, config, kofamout)
 end
 
-struct Muscle <: AbstractExternalProgram
-    cmd::Cmd
-    cpu::Int
-    input::String
-    result::MSA
+function kofamconfig!(profile_dir::String, ko_list::String, hmmsearch_path::String, paralell_path::String, output_dir::String)
+    output_dir = joinpath(output_dir, "config.yml")
+    config =
+    """
+    profile: $(profile_dir)
+    ko_list: $(ko_list)
+    hmmsearch: $(hmmsearch_path)
+    paralell: $(paralell_path)
+    """
+    open(config_path, "r") do io
+        write(io, config)
+    end
+    return config_path
 end
 
-function Muscle(input::String, result::MSA, cpu::Int)
-    cmd = `muscle -align $(input) -output $(path(result)) -threads $(cpu) -amino`
-    return Muscle(cmd, cpu, input, result)
-end
-
-struct Hmmbuild <: AbstractExternalProgram
-    cmd::Cmd
-    cpu::Int
-    input::MSA
-    result::Profile
-end
-
-function Hmmbuild(input::MSA, result::Profile, cpu::Int)
-    cmd = `hmmbuild --amino --cpu $(cpu) $(path(result)) $(path(input))`
-    return Hmmbuild(cmd, cpu, input, result)
-end
-
-struct Hmmsearch <: AbstractExternalProgram
-    cmd::Cmd
-    cpu::Int
-    input::Profile
-    result::Tblout
-end
-
-function Hmmsearch(input::String, profile::Profile, result::Tblout, cpu::Int)
-    min = minbit(profile)
-    cmd = `hmmsearch --tblout $(path(result)) -T $(min) --cpu $(cpu) $(path(profile)) $(input)`
-    return Hmmsearch(cmd, cpu, profile, result)
-end
-
-struct Blast <: AbstractExternalProgram
+struct Blast <: AbstractExternalProSgram
     cmd::Cmd
     cpu::Int
     input::String
@@ -60,8 +45,8 @@ struct Blast <: AbstractExternalProgram
     result::Blastout
 end
 
-function Blast(input::String, db::String, output::Blastout, evalue::Float64, cpu::Int)
-    cmd = `diamond blastp --db $(db) --query $(input) --outfmt 6 --threads $(cpu) --evalue $(evalue) -k 500 --out $(path(output))`
-    return Blast(cmd, cpu, input, db, output)
+function Blast(input::String, db::String, output::String, evalue::Float64, cpu::Int)
+    cmd = `diamond blastp --db $(db) --query $(input) --outfmt 6 --threads $(cpu) --evalue $(evalue) -k 500 --out $(output)`
+    blastout = Blastout(output, input, db)
+    return Blast(cmd, cpu, input, db, blastout)
 end
-z
