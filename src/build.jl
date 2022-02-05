@@ -1,21 +1,18 @@
 const OneOrVector{T} = Union{T, Vector{T}}
 
-function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{Int,Int}}}}, hmmdir::String, ko_list::String, outputdir::String, cpu::Int)
+function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{Int,Int}}}}, hmmdir::String, ko_list::String, outdir::String, cpu::Int)
     if !isa(source_path, Vector)
         sources = [sources]
     end
 
-    kofamoutdir = joinpath(outputdir, "kofam")
-    mkpath(kofamoutdir)    
-    resultdir = joinpath(outputdir, "fasta")
-    mkpath(resultdir)
+    kofamoutdir = joinpath(outdir, "kofam")
+    mkpath(kofamoutdir)
 
     kofam_results = map(sources) do source
-        (source, runkofamscan!(first(source), hmmdir, ko_list, kofamoutdir, cpu), last(source))
+        (first(source), runkofamscan!(first(source), hmmdir, ko_list, kofamoutdir, cpu), last(source))
     end
 
-
-
+    build!(kofam_results, outdir)
 end
 
 function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, outdir::String, cpu::Int)
@@ -38,11 +35,36 @@ function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, out
     return kofam_hit
 end
 
-function (kofam_results::Vector{Tuple{String,String,Tuple{String,Tuple{Int,Int}}}}, outdir::String)
+function build!(kofam_results::Vector{Tuple{String,String,Tuple{String,Tuple{Int,Int}}}}, outdir::String)
+    fasta_out = joinpath(outdir, ".fasta")
+    taxid_table = joinpath(outdir, ".taxid")
+    open(FASTA.Writer, fasta_out) do o; open(taxid_table, "r") do p
     for result in kofam_results
         source = first(result)
         kofam_hit = result[2]
         taxid_pairs = last(result)
+        taxid_path = first(taxid_pairs)
+        col_pair = last(taxid_pairs)
+        accession_col = first(col_pair)
+        taxid_col = last(col_pair)
 
-        open
+        open(FASTA.Reader, source) do reader ; open(kofam_hit, "r") do f; open(taxid_path , "r") do g
+            hit_ids = [first(split(l, "\t")) for l in eachline(f)]
+            hit_record = [record for record in reader if in(identifier(record), hit_ids)]
+            for record in hit_record
+                write(o,record)
+            end
+
+            for l in eachline(g)
+                row = split(l, "\t")
+                accession = row[accession_col]
+                taxid = row[taxid_col]
+                if accession in hit_ids
+                    write(p, "$(accession)\t$(taxid)\n")
+                end
+            end       
+        end; end; end
+    end; end
+    db = SQLite.DB(taxid_table * ".db")
+    BlastLCA.create!(db, taxid_table, header=false, delim="\t", accession_col=1, taxid_col=2)
 end
