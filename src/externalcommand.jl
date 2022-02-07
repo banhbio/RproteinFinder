@@ -18,7 +18,7 @@ function Kofamscan(input::String, outdir::String, namae::String, profile_dir::St
     mkpath(tmp_dir)
     output = joinpath(outdir, "$(namae).kofam.tblout")
     cmd = `exec_annotation -o $(output) --tmp-dir $(tmp_dir) --cpu=$(cpu) -c $(config) $(input)`
-    kofamout = Kofamout(input, output, config)
+    kofamout = Kofamout(output, input, config)
     return Kofamscan(cmd, cpu, input, config, kofamout)
 end
 

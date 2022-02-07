@@ -38,8 +38,8 @@ function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, out
 end
 
 function build!(kofam_results::Vector{Tuple{String,String,Tuple{String,Tuple{Int,Int}}}}, outdir::String)
-    fasta_out = joinpath(outdir, "rproteis.fasta")
-    taxid_table = joinpath(outdir, "rproteis.taxid")
+    fasta_out = joinpath(outdir, "rproteins.fasta")
+    taxid_table = joinpath(outdir, "rproteins.taxid")
     open(FASTA.Writer, fasta_out) do o; open(taxid_table, "w") do p
         for result in kofam_results
             source = first(result)
