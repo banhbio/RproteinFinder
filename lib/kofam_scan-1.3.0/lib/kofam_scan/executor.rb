@@ -122,7 +122,7 @@ module KofamScan
       end
 
       HMMSearch.command_path = config.hmmsearch
-      HMMSearch.new("{}", config.query, cpu: 64, o: out, T: 0, tblout: result).to_a
+      HMMSearch.new("{}", config.query, cpu: 8, o: out, T: 0, tblout: result).to_a
     end
 
     def search_hit_genes
