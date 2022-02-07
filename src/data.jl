@@ -11,7 +11,7 @@ end
 @inline query(blastout::Blastout) = blastout.query
 @inline subject(blastout::Blastout) = blastout.subject
 
-struct Kofamout <:AbstractExternalProgram
+struct Kofamout <:AbstractData
     path::String
     query::String
     config::String
@@ -23,7 +23,7 @@ function hits(kofamout::Kofamout)
     hit_list = Tuple{String,String}[]
     f = open(path(kofamout), "r")
     for l in eachline(f)
-        l[1] != '*' : continue : nothing
+        l[1] != '*' ? continue : nothing
         row = split(l, r" +")
         push!(hit_list, (row[2], row[3]))
     end
