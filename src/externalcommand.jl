@@ -1,7 +1,7 @@
 abstract type AbstractExternalProgram end
 
 Base.run(ep::AbstractExternalProgram) = Base.run(ep.cmd)
-result(ep::AbstractExternalProgram) = run(ep.result)
+result(ep::AbstractExternalProgram) = ep.result 
 
 
 struct Kofamscan <: AbstractExternalProgram

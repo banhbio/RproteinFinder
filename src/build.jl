@@ -28,8 +28,8 @@ function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, out
     kofamout = result(kofamscan)
 
     hit_list = hits(kofamout)
-    kofam_hit = joinpath(kofamoutdir, "$(namae).ko.txt")
-    open(kofam_hit ,"r") do o
+    kofam_hit = joinpath(outdir, "$(namae).ko.txt")
+    open(kofam_hit ,"w") do o
         for hit in hit_list
             write(o, "$(first(hit))\t$(last(hit))\n")
         end
@@ -38,9 +38,9 @@ function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, out
 end
 
 function build!(kofam_results::Vector{Tuple{String,String,Tuple{String,Tuple{Int,Int}}}}, outdir::String)
-    fasta_out = joinpath(outdir, ".fasta")
-    taxid_table = joinpath(outdir, ".taxid")
-    open(FASTA.Writer, fasta_out) do o; open(taxid_table, "r") do p
+    fasta_out = joinpath(outdir, "rproteis.fasta")
+    taxid_table = joinpath(outdir, "rproteis.taxid")
+    open(FASTA.Writer, fasta_out) do o; open(taxid_table, "w") do p
         for result in kofam_results
             source = first(result)
             kofam_hit = result[2]
