@@ -8,46 +8,16 @@ function findrproteins(;query::String, output::String, tempdir::String, profilel
     end  
     
     @info "Start Rproteinfinder.jl to find rproteins"
-    profilelist = profilefromlist(profilelist_path, hmmdir, 0.9)
 
-    for profile in profilelist
-        @info "Starting with $profile"
-        tblout_path = joinpath(tempdir, "hits", name(profile) * ".tbl")
-        tblout = Tblout(tblout_path, query)
-
-        @info "@$(profile)\tRunning hmmsearch"
-        hmmserach = Hmmsearch(query, profile, tblout, cpu)
-        run(hmmserach)
-    end
-
-    profile_d = Dict{String, String}()
-    allhits = String[]
-    for profile in profilelist
-        @info "@$(profile)\tWriting hmmsearch hits to .fasta file"
-        tblout_path = joinpath(tempdir, "hits", name(profile) * ".tbl")
-        tblout = Tblout(tblout_path, query)
-        hitid = hits(tblout)
-        for hit in hitid
-#            @assert !haskey(profile_d, hit)
-            profile_d[hit] = name(profile)
-        end
-        append!(allhits, hitid)
-        if isempty(hitid)
-            @info "@$(profile)\tThere is no hmmsearch hit in $(query)"
-            continue
-        end
-    end
+    kofamoutdir = joinpath(tempdir, "kofam")   
+    kofam_hit = runkofamscan!(query, hmmdir, ko_list, kofamoutdir, cpu)
     
     hits_path = joinpath(tempdir, "hits.fasta")
-    writer = open(FASTA.Writer, hits_path)
-    reader = open(FASTA.Reader, query)
-    for record in reader
-        if identifier(record) in allhits
-            write(writer, record)
-        end
+    open(FASTA.Reader, query) do reader; open(kofam_hit, "r") do f; open(FASTA.writer, hits_fasta) do o
+        hit_ids = [first(split(l, "\t")) for l in eachline(f)]
+        hit_record = [record for record in reader if in(identifier(record), hit_ids)]
+        map(x -> write(o, x), hit_record)
     end
-    close(writer)
-    close(reader)
     
     if filesize(hits_path) == 0
         @info "@all There is no hmmserach hit in $(query)"
@@ -56,36 +26,32 @@ function findrproteins(;query::String, output::String, tempdir::String, profilel
 
     @info "Running diamond blastp"
     blastout_path = joinpath(tempdir, "blastout.tsv")
-    blastout = Blastout(blastout_path, hits_path, db_path)
-
-    blast = Blast(hits_path, db_path, blastout, 1e-05, cpu)
+    blast = Blast(hits_path, db_path, blastout_path, 1e-05, cpu)
     run(blast)
-
-    o = open(output, "w")
+    blastout = result(blast)
 
     if filesize(path(blastout)) == 0
         @info "There is no diamond blastp hit in $(db_path)"
         return
     end
 
-    f = open(path(blastout), "r")
-    fun = x-> weightedLCA(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_precision)
     @info "Running blastLCA"
+    open(path(blastout), "r") do f; open(out, "w") do o
+        fun = x-> weightedLCA(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_precision)
         
-    lca_ch = blastLCA(f;
-              sqlite=taxid_db,
-              taxonomy=taxonomy,
-              method=fun,
-              header=false,
-              ranks=blastlca_ranks,
-              rmselfhit=true
-              )
+        lca_ch = blastLCA(f;
+                          sqlite=taxid_db,
+                          taxonomy=taxonomy,
+                          method=fun,
+                          header=false,
+                          ranks=blastlca_ranks,
+                          rmselfhit=true
+                        )
 
-    for (qseqid, taxon, lineage) in lca_ch
-        id = taxid(taxon)
-        lineage_txt = sprint(io -> print_lineage(io, lineage))
-        write(o, "$(qseqid)\t$(profile_d[qseqid])\t$(id)\t$(lineage_txt)\n")
-    end
-    close(f)
-    close(o)
+        for (qseqid, taxon, lineage) in lca_ch
+            id = taxid(taxon)
+            lineage_txt = sprint(io -> print_lineage(io, lineage))
+            write(o, "$(qseqid)\t$(profile_d[qseqid])\t$(id)\t$(lineage_txt)\n")
+        end
+    end;end
 end
