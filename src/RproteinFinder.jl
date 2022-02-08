@@ -3,7 +3,7 @@ using BlastLCA
 using Taxonomy
 using SQLite
 using FASTX
-
+using JSON
 
 include("data.jl")
 include("utils.jl")

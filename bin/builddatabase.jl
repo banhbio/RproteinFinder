@@ -14,23 +14,8 @@ function parse_commandline()
             arg_type = Int
             default = 1
         
-        "--input", "-i"
-            help = "input protein file (fasta format)"
-            arg_type = AbstractString
-            required = true
-
-        "--taxonomy_db"
-            help = "taxonomy database (directory where nodes.dmp and names.dmp)"
-            arg_type = AbstractString
-            required = true
-        
-        "--seq2taxonomy_db"
-            help = "seq2taxonomy seqlite database"
-            arg_type = AbstractString
-            required = true
-
-        "--profilelist"
-            help = "output profile list"
+        "--input"
+            help = "input file .json format"
             arg_type = AbstractString
             required = true
 
@@ -39,7 +24,12 @@ function parse_commandline()
             arg_type = AbstractString
             required = true
 
-        "--outputdir"
+        "--ko_list"
+            help = "ko_list.txt file"
+            arg_type = AbstractString
+            required = true
+
+        "--outdir"
             help = "output directory"
             arg_type = AbstractString
             required = true
@@ -57,34 +47,23 @@ function main()
     @assert isfile(parsed_args["input"])
     input = abspath(parsed_args["input"])
 
-    @assert isdir(parsed_args["taxonomy_db"])
-    taxonomy_db = abspath(parsed_args["taxonomy_db"])
-
-    @assert isfile(parsed_args["seq2taxonomy_db"])
-    seq2taxonomy_db = abspath(parsed_args["seq2taxonomy_db"])
-
     @assert isdir(parsed_args["hmmdir"])
     hmmdir = abspath(parsed_args["hmmdir"])
 
-    outputdir = abspath(parsed_args["outputdir"])
+    @assert isfile(parsed_args["ko_list"])
+    ko_list = abspath(parsed_args["ko_list"])
 
-    @assert isfile(parsed_args["profilelist"])
-    profilelist = abspath(parsed_args["profilelist"])
+    outdir = abspath(parsed_args["outdir"])
 
-    taxonomy = Taxonomy.DB(taxonomy_db, "nodes.dmp","names.dmp")
-    sqlite = SQLite.DB(seq2taxonomy_db)
-    euk = Taxon(2759, taxonomy)
+    sources = RproteinFinder.parse_input(input)
 
-    @info "Parsed args:" thread input taxonomy_db seq2taxonomy_db hmmdir outputdir profilelist
+    @info "Parsed args:" input hmmdir ko_list outdir
 
-    RproteinFinder.builddatabase(; source_path=input,
-                                   taxonomic_scope=euk,
-                                   taxonomy=taxonomy,
-                                   taxid_sqlite=sqlite,
-                                   profilelist_path=profilelist,
-                                   hmmdir=hmmdir,
-                                   outputdir=outputdir,
-                                   cpu=thread)
+    RproteinFinder.builddatabase!(; sources=sources,
+                                     hmmdir=hmmdir,
+                                     ko_list=ko_list,
+                                     outdir=outdir,
+                                     cpu=thread)
 end
 
 main()
