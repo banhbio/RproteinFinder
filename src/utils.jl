@@ -1,4 +1,5 @@
-function parse_input(f::IOStream)
+function parse_input(s::String)
+    f = open(s, "r")
     d = JSON.parse(f)
     result = Tuple{String,Tuple{String,Tuple{Int,Int}}}[]
     for key in keys(d)
