@@ -33,12 +33,27 @@ function parse_commandline()
             help = "rproteins database"
             arg_type = AbstractString
             required = true
-        
-        "--profilelist"
-            help = "output profile list"
+
+        "--hmmdir"
+            help = "hmm profile directory"
             arg_type = AbstractString
             required = true
 
+        "--thread", "-t"
+            help = "used thread in running external programs"
+            arg_type = Int
+            default = 1
+        
+        "--hmmdir"
+            help = "hmm profile directory"
+            arg_type = AbstractString
+            required = true
+
+        "--ko_list"
+            help = "ko_list.txt file"
+            arg_type = AbstractString
+            required = true
+        
         "--taxonomy_db"
             help = "taxonomy database (directory where nodes.dmp and names.dmp)"
             arg_type = AbstractString
@@ -48,12 +63,6 @@ function parse_commandline()
             help = "seq2taxonomy seqlite database"
             arg_type = AbstractString
             required = true
-        
-        "--hmmdir"
-            help = "hmm profile directory"
-            arg_type = AbstractString
-            required = true
-
     end
 
     return parse_args(s)
@@ -68,20 +77,20 @@ function main()
     @assert isfile(realpath(parsed_args["input"]))
     input = abspath(parsed_args["input"])
 
-    @assert isfile(realpath(parsed_args["profilelist"]))
-    profilelist = abspath(parsed_args["profilelist"])
-
     @assert isfile(realpath(parsed_args["db_path"]))
     db = abspath(parsed_args["db_path"])
+    
+    @assert isdir(realpath(parsed_args["hmmdir"]))
+    hmmdir = abspath(parsed_args["hmmdir"])
+
+    @assert isfile(realpath(parsed_args["ko_list"]))
+    ko_list = abspath(parsed_args["ko_list"])
 
     @assert isdir(realpath(parsed_args["taxonomy_db"]))
     taxonomy_db = abspath(parsed_args["taxonomy_db"])
 
     @assert isfile(realpath(parsed_args["seq2taxonomy_db"]))
     seq2taxonomy_db = abspath(parsed_args["seq2taxonomy_db"])
-
-    @assert isdir(realpath(parsed_args["hmmdir"]))
-    hmmdir = abspath(parsed_args["hmmdir"])
 
     tempdir = abspath(parsed_args["tempdir"])
     output = abspath(parsed_args["output"])
@@ -105,7 +114,7 @@ function main()
     RproteinFinder.findrproteins(;query=input,
                                 output=output,
                                 tempdir=tempdir,
-                                profilelist_path=profilelist,
+                                ko_list=ko_list,
                                 db_path=db,
                                 taxonomy=taxonomy,
                                 taxid_db=sqlite,
