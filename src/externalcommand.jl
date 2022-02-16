@@ -3,42 +3,45 @@ abstract type AbstractExternalProgram end
 Base.run(ep::AbstractExternalProgram) = Base.run(ep.cmd)
 result(ep::AbstractExternalProgram) = ep.result 
 
-
-struct Kofamscan <: AbstractExternalProgram
-    cmd::Cmd
+struct Hmmsearch <: AbstractExternalProgram
+    cmd::Base.AbstractCmd
     cpu::Int
     input::String
-    config::String
-    result::Kofamout
+    profile::Profile
+    result::Tblout
 end
 
-function Kofamscan(input::String, outdir::String, namae::String, profile_dir::String, ko_list::String, hmmsearch_path::String, paralell_path::String, cpu::Int)
-    config = kofamconfig!(profile_dir, ko_list, hmmsearch_path, paralell_path, outdir)
-    tmp_dir = joinpath(outdir, "$(namae).tmp")
-    mkpath(tmp_dir)
-    output = joinpath(outdir, "$(namae).kofam.tblout")
-    cmd = `$(@__DIR__)/../lib/kofam_scan-1.3.0/exec_annotation -o $(output) --tmp-dir $(tmp_dir) --cpu=$(cpu) -c $(config) $(input)`
-    kofamout = Kofamout(output, input, config)
-    return Kofamscan(cmd, cpu, input, config, kofamout)
+function Hmmsearch(input::String, profile::Profile, output::String, evalue::Float64, cpu::Int)
+    cmd = `hmmsearch --cpu $(cpu) --tblout $(output) -E $(evalue) $(path(profile)) $(input)`
+    tblout = Tblout(output, input, profile)
+    return Hmmsearch(cmd, cpu, input, profile, tblout)
 end
 
-function kofamconfig!(profile_dir::String, ko_list::String, hmmsearch_path::String, paralell_path::String, outdir::String)
-    config_path = joinpath(outdir, "config.yml")
-    config =
-    """
-    profile: $(profile_dir)
-    ko_list: $(ko_list)
-    hmmsearch: $(hmmsearch_path)
-    paralell: $(paralell_path)
-    """
-    open(config_path, "w") do io
-        write(io, config)
-    end
-    return config_path
+struct SeqkitGrep <: AbstractExternalProgram
+    cmd::Base.AbstractCmd
+    input::String
+    ids::Vector{String}
+    result::String
 end
+
+function SeqkitGrep(input::String, output::String, ids::Vector{String})
+    cmd = pipeline(pipeline(`cat $(ids)`, `seqkit grep -f - $(input)`), stdout=output, append=true)
+    return SeqkitGrep(cmd, input, ids, output)
+end
+
+struct MakeBlastDB <: AbstractExternalProgram
+    cmd::Base.AbstractCmd
+    input::String
+    result::String
+end
+
+function MakeBlastDB(input::String)
+    cmd = `diamond makedb --in $(input) -d $(input)`
+    result = $(input) * ".db"
+    return MakeBlastDB(cmd, input, result)
 
 struct Blast <: AbstractExternalProgram
-    cmd::Cmd
+    cmd::Base.AbstractCmd
     cpu::Int
     input::String
     db::String

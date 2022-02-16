@@ -23,51 +23,52 @@ function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, out
 
     namae = basename(source_path)
 
-    kofamscan = Kofamscan(source_path, outdir, namae, hmmdir, ko_list, hmmsearch_path, parallel_path, cpu)
+    kofamscan = Kofamscan(source_path, outdir, namae, hmmdir, ko_list, cpu)
     run(kofamscan)
     kofamout = result(kofamscan)
 
-    hit_list = hits(kofamout)
-    kofam_hit = joinpath(outdir, "$(namae).ko.txt")
-    open(kofam_hit ,"w") do o
-        for hit in hit_list
-            write(o, "$(first(hit))\t$(last(hit))\n")
-        end
-    end
-    return kofam_hit
+    return kofamout
 end
 
-function build!(kofam_results::Vector{Tuple{String,String,Tuple{String,Tuple{Int,Int}}}}, outdir::String)
+function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{Int,Int}}}}, outdir::String)
     fasta_out = joinpath(outdir, "rproteins.fasta")
     taxid_table = joinpath(outdir, "rproteins.taxid")
-    open(FASTA.Writer, fasta_out) do o; open(taxid_table, "w") do p
-        for result in kofam_results
-            source = first(result)
-            kofam_hit = result[2]
-            taxid_pairs = last(result)
-            taxid_path = first(taxid_pairs)
-            col_pair = last(taxid_pairs)
-            accession_col = first(col_pair)
-            taxid_col = last(col_pair)
 
-            open(FASTA.Reader, source) do reader ; open(kofam_hit, "r") do f; open(taxid_path , "r") do g
-                hit_ids = [first(split(l, "\t")) for l in eachline(f)]
-                hit_record = [record for record in reader if in(identifier(record), hit_ids)]
-                for record in hit_record
-                    write(o,record)
-                end
+    taxid_tmp = taxid_table * "tmp"
+    o = open(taxid_tmp, "w")
+    for result in kofam_results
+        source = first(result)
+        kofamout = result[2]
+        taxid_pairs = last(result)
+        taxid_path = first(taxid_pairs)
+        col_pair = last(taxid_pairs)
+        accession_col = first(col_pair)
+        taxid_col = last(col_pair)
 
-                for l in eachline(g)
-                    row = split(l, "\t")
-                    accession = row[accession_col]
-                    taxid = row[taxid_col]
-                    if accession in hit_ids
-                        write(p, "$(accession)\t$(taxid)\n")
-                    end
-                end       
-            end; end; end
+        kofam_hits = hits(kofamout)
+        
+        seqkitgrep = SeqkitGrep(source, fasta_out, kofam_hits)
+        run(seqkitgrep)
+
+        tmpdb_path = joinpath(outdir, basename(taxid_path) * ".db")
+        db = SQLite.DB(tmpdb_path)
+        BlastLCA.create!(db, taxid_path; delim = "\t", header=false, delim="\t", accession_col=accession_col, taxid_col=taxid_col)
+
+        for hit in kofam_hits
+            taxid = get(db, hit, nothing)
+            write(o, "$(hit)\t$(taxid)\n")
         end
-    end; end
-    db = SQLite.DB(taxid_table * ".db")
-    BlastLCA.create!(db, taxid_table, header=false, delim="\t", accession_col=1, taxid_col=2)
+        rm(tmpdb_path)
+    end
+    close(o)
+
+    rm_duprow(taxid_tmp, taxid_table)
+
+    new_db = SQLite.DB(taxid_table * ".db")
+    BlastLCA.create!(new_db, taxid_table, header=false, delim="\t", accession_col=1, taxid_col=2)
+end
+
+function rm_duprow(input::String, output::String)
+    cmd = pipeline(pipeline(`cat $(input)`, `sort`, `uniq`), stdout=output)
+    run(cmd)
 end
