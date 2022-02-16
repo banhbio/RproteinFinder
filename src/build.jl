@@ -16,17 +16,10 @@ function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{I
 end
 
 function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, outdir::String, cpu::Int)
-    hmmsearch_path = Sys.which("hmmsearch")
-    parallel_path = Sys.which("parallel")
-    @assert !isnothing(hmmsearch_path)
-    @assert !isnothing(parallel_path)
-
     namae = basename(source_path)
-
     kofamscan = Kofamscan(source_path, outdir, namae, hmmdir, ko_list, cpu)
     run(kofamscan)
     kofamout = result(kofamscan)
-
     return kofamout
 end
 
