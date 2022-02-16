@@ -45,7 +45,7 @@ function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{I
 
         tmpdb_path = joinpath(outdir, basename(taxid_path) * ".db")
         db = SQLite.DB(tmpdb_path)
-        BlastLCA.create!(db, taxid_path; delim = "\t", header=false, delim="\t", accession_col=accession_col, taxid_col=taxid_col)
+        BlastLCA.create!(db, taxid_path; header=false, delim="\t", accession_col=accession_col, taxid_col=taxid_col)
 
         for hit in kofam_hits
             taxid = get(db, hit, nothing)

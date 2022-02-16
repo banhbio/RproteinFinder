@@ -1,4 +1,4 @@
-function findrproteins(;query::String, output::String, tempdir::String, profilelist_path::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_ranks::Vector{Symbol}, blastlca_precision::Dict{Symbol, Float64})
+function findrproteins(;query::String, output::String, tempdir::String, ko_list::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_ranks::Vector{Symbol}, blastlca_precision::Dict{Symbol, Float64})
     mkpath(joinpath(tempdir,"hits"))
     touch(output)
 
@@ -17,7 +17,7 @@ function findrproteins(;query::String, output::String, tempdir::String, profilel
         hit_ids = [first(split(l, "\t")) for l in eachline(f)]
         hit_record = [record for record in reader if in(identifier(record), hit_ids)]
         map(x -> write(o, x), hit_record)
-    end
+    end;end;end
     
     if filesize(hits_path) == 0
         @info "@all There is no hmmserach hit in $(query)"

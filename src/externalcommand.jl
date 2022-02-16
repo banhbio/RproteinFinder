@@ -37,8 +37,9 @@ end
 
 function MakeBlastDB(input::String)
     cmd = `diamond makedb --in $(input) -d $(input)`
-    result = $(input) * ".db"
+    result = input * ".db"
     return MakeBlastDB(cmd, input, result)
+end
 
 struct Blast <: AbstractExternalProgram
     cmd::Base.AbstractCmd
