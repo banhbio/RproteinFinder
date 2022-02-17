@@ -36,7 +36,7 @@ function findrproteins(;query::String, output::String, tempdir::String, ko_list:
 
     @info "running blastlca"
     open(path(blastout), "r") do f; open(output, "w") do o
-        fun = x-> weightedlca(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_precision)
+        fun = x-> weightedLCA(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_precision)
         
         lca_ch = blastLCA(f;
                           sqlite=taxid_db,
@@ -50,7 +50,7 @@ function findrproteins(;query::String, output::String, tempdir::String, ko_list:
         for (qseqid, taxon, lineage) in lca_ch
             id = taxid(taxon)
             lineage_txt = sprint(io -> print_lineage(io, lineage))
-            write(o, "$(qseqid)\t$(profile_d[qseqid])\t$(id)\t$(lineage_txt)\n")
+            write(o, "$(qseqid)\t$(id)\t$(lineage_txt)\n")
         end
     end;end
 end
