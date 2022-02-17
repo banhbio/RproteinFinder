@@ -39,16 +39,6 @@ function parse_commandline()
             arg_type = AbstractString
             required = true
 
-        "--thread", "-t"
-            help = "used thread in running external programs"
-            arg_type = Int
-            default = 1
-        
-        "--hmmdir"
-            help = "hmm profile directory"
-            arg_type = AbstractString
-            required = true
-
         "--ko_list"
             help = "ko_list.txt file"
             arg_type = AbstractString
@@ -108,7 +98,7 @@ function main()
                :genus => 0.95,
                :species => 1.0)
 
-    @info "Parsed args:" thread input output profilelist tempdir db taxonomy_db seq2taxonomy_db hmmdir minimal cutoff ranks precision
+    @info "Parsed args:" thread input output ko_list tempdir db taxonomy_db seq2taxonomy_db hmmdir minimal cutoff ranks precision
 
     
     RproteinFinder.findrproteins(;query=input,

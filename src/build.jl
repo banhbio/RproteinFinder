@@ -16,8 +16,7 @@ function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{I
 end
 
 function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, outdir::String, cpu::Int)
-    namae = basename(source_path)
-    kofamscan = Kofamscan(source_path, outdir, namae, hmmdir, ko_list, cpu)
+    kofamscan = Kofamscan(source_path, outdir, hmmdir, ko_list, cpu)
     run(kofamscan)
     kofamout = result(kofamscan)
     return kofamout

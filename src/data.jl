@@ -14,7 +14,7 @@ end
 struct Profile <: AbstractData
     path::String
     type::String
-    threshold::String
+    threshold::Float64
 end
 
 struct Kofamout <: AbstractData
@@ -25,8 +25,8 @@ struct Kofamout <: AbstractData
 end
 
 function hits(kofamout::Kofamout)
+    result = String[]
     open(path(kofamout), "r") do f
-        result = String[]
         for l in eachline(f)
             row = split(l, "\t")
             push!(result, first(row))
@@ -56,10 +56,10 @@ function hits(tblout::Tblout)
             rows = split(l, r" +")
             id = rows[1]
             ko = rows[3]
-            score = rows[score_row]
-            evalue = rows[score_row-1]
-            if profile.threshold >= score 
-                hit = (id, ko, profile.threshold, score, evalue)
+            score = parse(Float64, rows[score_row])
+            evalue = parse(Float64, rows[score_row-1])
+            if score >= profile.threshold
+                hit = (id, ko, score, profile.threshold, evalue)
                 push!(hit_list, hit)
             end
         end

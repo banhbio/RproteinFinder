@@ -1,5 +1,4 @@
 function findrproteins(;query::String, output::String, tempdir::String, ko_list::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_ranks::Vector{Symbol}, blastlca_precision::Dict{Symbol, Float64})
-    mkpath(joinpath(tempdir,"hits"))
     touch(output)
 
     if filesize(query) == 0
@@ -10,14 +9,14 @@ function findrproteins(;query::String, output::String, tempdir::String, ko_list:
     @info "Start Rproteinfinder.jl to find rproteins"
 
     kofamoutdir = joinpath(tempdir, "kofam")   
-    kofam_hit = runkofamscan!(query, hmmdir, ko_list, kofamoutdir, cpu)
+    kofamout = runkofamscan!(query, hmmdir, ko_list, kofamoutdir, cpu)
     
     hits_path = joinpath(tempdir, "hits.fasta")
-    open(FASTA.Reader, query) do reader; open(kofam_hit, "r") do f; open(FASTA.writer, hits_fasta) do o
-        hit_ids = [first(split(l, "\t")) for l in eachline(f)]
+    open(FASTA.Reader, query) do reader; open(FASTA.Writer, hits_path) do o
+        hit_ids = hits(kofamout)
         hit_record = [record for record in reader if in(identifier(record), hit_ids)]
         map(x -> write(o, x), hit_record)
-    end;end;end
+    end;end
     
     if filesize(hits_path) == 0
         @info "@all There is no hmmserach hit in $(query)"
@@ -35,9 +34,9 @@ function findrproteins(;query::String, output::String, tempdir::String, ko_list:
         return
     end
 
-    @info "Running blastLCA"
-    open(path(blastout), "r") do f; open(out, "w") do o
-        fun = x-> weightedLCA(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_precision)
+    @info "running blastlca"
+    open(path(blastout), "r") do f; open(output, "w") do o
+        fun = x-> weightedlca(x, blastlca_minimal, blastlca_cutoff, blastlca_ranks, blastlca_precision)
         
         lca_ch = blastLCA(f;
                           sqlite=taxid_db,
