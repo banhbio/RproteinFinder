@@ -57,6 +57,9 @@ function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{I
 
     rm_duprow(taxid_tmp, taxid_table)
 
+    makeblastdb = MakeBlastDB(fasta_out)
+    run(makeblastdb)
+    
     new_db = SQLite.DB(taxid_table * ".db")
     BlastLCA.create!(new_db, taxid_table, header=false, delim="\t", accession_col=1, taxid_col=2)
 end
