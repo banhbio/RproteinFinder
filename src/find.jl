@@ -1,7 +1,7 @@
 function findrproteins(;query::String, output::String, tempdir::String, ko_list::String, db_path::String, taxonomy::Taxonomy.DB, taxid_db::SQLite.DB, hmmdir::String, cpu::Int, blastlca_minimal::Float64, blastlca_cutoff::Float64, blastlca_ranks::Vector{Symbol}, blastlca_precision::Dict{Symbol, Float64})
     touch(output)
     mkpath(tempdir)
-    mkpath(joinpath(tempdir),kofam)
+    mkpath(joinpath(tempdir,kofam))
 
     if filesize(query) == 0
         @info "$(query) is empty"
