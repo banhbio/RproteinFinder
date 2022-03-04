@@ -56,7 +56,7 @@ end
 function make_kofamout(kofamout::Kofamout, tblouts::Vector{Tblout})
     open(path(kofamout), "w") do o
         for tblout in tblouts
-            for hit in hits(tblout)
+            for hit in kofamhits(tblout)
                 write(o, join(hit, "\t") * "\n")
             end
         end
