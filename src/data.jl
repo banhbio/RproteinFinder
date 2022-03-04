@@ -24,12 +24,25 @@ struct Kofamout <: AbstractData
     ko_list::String
 end
 
+struct KofamResult
+    id::String
+    ko::String
+    score::Float64
+    threshold::Float64
+    evalue::Float64
+end
+
+id(kofamresult::KofamResult) = kofamresult.id
+join(kofamresult::KofamResult, delim::AbstractString) = join([kofamresult.id, kofamresult.ko, kofamresult.score, kofamresult.threshold, kofamresult.evalue], delim)
+
 function hits(kofamout::Kofamout)
-    result = String[]
+    result = KofamResult[]
     open(path(kofamout), "r") do f
         for l in eachline(f)
             row = split(l, "\t")
-            push!(result, first(row))
+            @assert row == 5
+            kofamresult = KofamResult(row[1],row[2],row[3],row[4],row[5])
+            push!(result, kofamresult)
         end
     end
     return result
@@ -41,8 +54,8 @@ struct Tblout <: AbstractData
     profile::Profile
 end
 
-function hits(tblout::Tblout)
-    hit_list = Tuple{String, String, Float64, Float64, Float64}[]
+function kofamhits(tblout::Tblout)
+    hit_list = KofamResult[]
     profile = tblout.profile
     if profile.type == "full"
         score_row = 6
@@ -59,7 +72,7 @@ function hits(tblout::Tblout)
             score = parse(Float64, rows[score_row])
             evalue = parse(Float64, rows[score_row-1])
             if score >= profile.threshold
-                hit = (id, ko, score, profile.threshold, evalue)
+                hit = KofamResult(id, ko, score, profile.threshold, evalue)
                 push!(hit_list, hit)
             end
         end
