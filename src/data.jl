@@ -80,3 +80,29 @@ function kofamhits(tblout::Tblout)
 
     return hit_list
 end
+
+function besthit(tblout::Tblout)
+    open(path(tblout), "r") do f
+        result = BlastResult[]
+        
+        tmp_besthit = nothing
+        bestscore = 0
+        id = nothing
+        for l in eachline(f)
+            record = BlastResult(l)
+            new_score = record.birscore
+            new_id = record.qseqid
+            if id == new_id
+                if new_score > bestscore
+                    tmp_besthit = record
+                end
+            else
+                push!(result, tmp_besthit)
+                tmp_besthit = nothing
+                bestscore = 0
+                id = nothing
+            end
+        end
+        return result
+    end            
+end
