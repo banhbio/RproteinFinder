@@ -33,15 +33,19 @@ struct KofamResult
 end
 
 id(kofamresult::KofamResult) = kofamresult.id
-join(kofamresult::KofamResult, delim::AbstractString) = join([kofamresult.id, kofamresult.ko, kofamresult.score, kofamresult.threshold, kofamresult.evalue], delim)
+Base.join(kofamresult::KofamResult, delim::AbstractString) = join([kofamresult.id, kofamresult.ko, kofamresult.score, kofamresult.threshold, kofamresult.evalue], delim)
 
 function hits(kofamout::Kofamout)
     result = KofamResult[]
     open(path(kofamout), "r") do f
         for l in eachline(f)
             row = split(l, "\t")
-            @assert row == 5
-            kofamresult = KofamResult(row[1],row[2],row[3],row[4],row[5])
+            id = row[1]
+            ko = row[2]
+            score = parse(Float64, row[3])
+            threshold = parse(Float64, row[4])
+            evalue = parse(Float64, row[5])
+            kofamresult = KofamResult(id, ko, score, threshold, evalue)
             push!(result, kofamresult)
         end
     end
