@@ -24,10 +24,9 @@ end
 
 function run_hmmsearch(input::String, outdir::String, profile_list::Vector{Profile}, cpu::Int) 
     tblouts = Tblout[]
-    outdir_tmp = joinpath(outdir, basename(input))
     for profile in profile_list
         namae = basename(path(profile))
-        output = joinpath(outdir_tmp, namae)
+        output = joinpath(outdir, namae)
         hmmsearch = Hmmsearch(input, profile, output, 1e-05, cpu)
         run(hmmsearch)
         tblout = result(hmmsearch)

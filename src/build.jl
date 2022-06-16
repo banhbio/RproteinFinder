@@ -9,7 +9,10 @@ function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{I
     mkpath(kofamoutdir)
 
     kofam_results = map(sources) do source
-        (first(source), runkofamscan!(first(source), hmmdir, ko_list, kofamoutdir, cpu), last(source))
+        namae = basename(first(source))
+        kofamoutdirforeach = joinpath(kofamoutdir, namae)
+        mkpath(kofamoutdirforeach)
+        (first(source), runkofamscan!(first(source), hmmdir, ko_list, kofamoutdirforeach, cpu), last(source))
     end
 
     build!(kofam_results, outdir)
