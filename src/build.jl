@@ -41,8 +41,9 @@ function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{I
         taxid_col = last(col_pair)
 
         kofam_hits = hits(kofamout)
+        hit_ids = map(x -> id(x), kofam_hits)
         
-        seqkitgrep = SeqkitGrep(source, fasta_out, kofam_hits)
+        seqkitgrep = SeqkitGrep(source, fasta_out, hit_ids)
         run(seqkitgrep)
 
         tmpdb_path = joinpath(outdir, basename(taxid_path) * ".db")
