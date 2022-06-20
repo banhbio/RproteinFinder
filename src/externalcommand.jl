@@ -25,7 +25,7 @@ struct SeqkitGrep <: AbstractExternalProgram
 end
 
 function SeqkitGrep(input::String, output::String, ids::String)
-    cmd = `seqkit grep -f $(ids) $(input) > $(output)`)
+    cmd = `seqkit grep -f $(ids) $(input) > $(output)`
     return SeqkitGrep(cmd, input, ids, output)
 end
 
