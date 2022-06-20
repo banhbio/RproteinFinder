@@ -43,7 +43,7 @@ function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{I
         kofam_hits = hits(kofamout)
         hit_ids = map(x -> id(x), kofam_hits)
         
-        tmp_ids_file = joinpath(outdir, source * ".hit_id")
+        tmp_ids_file = joinpath(outdir, basename(source) * ".hit_id")
         o_tmp = open(tmp_ids_file, "w")
         for id in hit_ids
             write(o_tmp, "$(id)\n")
