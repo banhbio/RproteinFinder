@@ -20,12 +20,12 @@ end
 struct SeqkitGrep <: AbstractExternalProgram
     cmd::Base.AbstractCmd
     input::String
-    ids::Vector{String}
+    ids::String
     result::String
 end
 
-function SeqkitGrep(input::String, output::String, ids::Vector{String})
-    cmd = pipeline(pipeline(`cat $(ids)`, `seqkit grep -f - $(input)`), stdout=output, append=true)
+function SeqkitGrep(input::String, output::String, ids::String)
+    cmd = `seqkit grep -f $(ids) $(input) > $(output)`)
     return SeqkitGrep(cmd, input, ids, output)
 end
 

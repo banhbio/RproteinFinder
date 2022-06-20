@@ -29,7 +29,7 @@ function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{I
     fasta_out = joinpath(outdir, "rproteins.fasta")
     taxid_table = joinpath(outdir, "rproteins.taxid")
 
-    taxid_tmp = taxid_table * "tmp"
+    taxid_tmp = taxid_table * ".tmp"
     o = open(taxid_tmp, "w")
     for result in kofam_results
         source = first(result)
@@ -43,14 +43,21 @@ function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{I
         kofam_hits = hits(kofamout)
         hit_ids = map(x -> id(x), kofam_hits)
         
-        seqkitgrep = SeqkitGrep(source, fasta_out, hit_ids)
+        tmp_ids_file = joinpath(outdir, source * ".hit_id")
+        o_tmp = open(tmp_ids_file, "w")
+        for id in hit_ids
+            write(o_tmp, "$(id)\n")
+        end
+        close(o_tmp)
+
+        seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file)
         run(seqkitgrep)
 
         tmpdb_path = joinpath(outdir, basename(taxid_path) * ".db")
         db = SQLite.DB(tmpdb_path)
         BlastLCA.create!(db, taxid_path; header=false, delim="\t", accession_col=accession_col, taxid_col=taxid_col)
 
-        for hit in kofam_hits
+        for hit in hit_ids
             taxid = get(db, hit, nothing)
             write(o, "$(hit)\t$(taxid)\n")
         end
