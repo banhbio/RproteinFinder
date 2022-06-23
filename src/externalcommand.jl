@@ -24,8 +24,8 @@ struct SeqkitGrep <: AbstractExternalProgram
     result::String
 end
 
-function SeqkitGrep(input::String, output::String, ids::String)
-    cmd = pipeline(`seqkit grep -f $(ids) $(input)`, stdout=output)
+function SeqkitGrep(input::String, output::String, ids::String; append=true)
+    cmd = pipeline(`seqkit grep -f $(ids) $(input)`, stdout=output, append = append)
     return SeqkitGrep(cmd, input, ids, output)
 end
 
