@@ -1,10 +1,9 @@
 const OneOrVector{T} = Union{T, Vector{T}}
 
-function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{Int,Int}}}}, hmmdir::String, ko_list::String, outdir::String, cpu::Int)
+function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{Int,Int}}}}, hmmdir::String, ko_list::String, outdir::String, cpu::Int, fromhmmresult::Bool)
     if !isa(sources, Vector)        
         sources = [sources]
     end
-
     kofamoutdir = joinpath(outdir, "kofam")
     mkpath(kofamoutdir)
 
@@ -12,7 +11,12 @@ function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{I
         namae = basename(first(source))
         kofamoutdirforeach = joinpath(kofamoutdir, namae)
         mkpath(kofamoutdirforeach)
-        (first(source), runkofamscan!(first(source), hmmdir, ko_list, kofamoutdirforeach, cpu), last(source))
+        if !fromhmmresult
+            (first(source), runkofamscan!(first(source), hmmdir, ko_list, kofamoutdirforeach, cpu), last(source))
+        else
+            kofamout = parsehmmresult(first(source), hmmdir, ko_list, kofamoutdirforeach)
+            (first(source), kofamout, last(source))
+        end
     end
 
     build!(kofam_results, outdir)
@@ -22,6 +26,13 @@ function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, out
     kofamscan = Kofamscan(source_path, outdir, hmmdir, ko_list, cpu)
     run(kofamscan)
     kofamout = result(kofamscan)
+    return kofamout
+end
+
+function parsehmmresult(source_path::String, hmmdir::String, ko_list::String, outdir::String)
+    namae = basename(source_path)
+    kofamout_path = joinpath(outdir, namae * ".kofam.tblout")
+    kofamout = Kofamout(kofamout_path, source_path, hmmdir, ko_list)
     return kofamout
 end
 

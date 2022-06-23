@@ -33,6 +33,10 @@ function parse_commandline()
             help = "output directory"
             arg_type = AbstractString
             required = true
+
+        "--fromhmmresult"
+            help = "start from hmmsearch result"
+            action = :store_true
     end
 
     return parse_args(s)
@@ -55,6 +59,8 @@ function main()
 
     outdir = abspath(parsed_args["outdir"])
 
+    fromhmmresult = parsed_args["fromhmmresult"]
+
     sources = RproteinFinder.parse_input(input)
 
     @info "Parsed args:" input hmmdir ko_list outdir
@@ -63,7 +69,8 @@ function main()
                                      hmmdir=hmmdir,
                                      ko_list=ko_list,
                                      outdir=outdir,
-                                     cpu=thread)
+                                     cpu=thread,
+                                     fromhmmresult=fromhmmresult)
 end
 
 main()
