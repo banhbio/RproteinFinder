@@ -40,8 +40,8 @@ function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{I
     fasta_out = joinpath(outdir, "rproteins.fasta")
     taxid_table = joinpath(outdir, "rproteins.taxid")
 
-    rm(fasta_out)
-    rm(taxid_table)
+    rm(fasta_out, force=true)
+    rm(taxid_table, force=true)
 
     taxid_tmp = taxid_table * ".tmp"
     o = open(taxid_tmp, "w")
