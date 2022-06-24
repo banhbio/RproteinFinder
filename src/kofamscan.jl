@@ -7,11 +7,11 @@ struct Kofamscan
     result::Kofamout
 end
 
-function Kofamscan(input::String, outdir::String, profiledir::String, ko_list::String, cpu::Int)
+function Kofamscan(input::String, outdir::String, hmmdir::String, ko_list::String, cpu::Int)
     namae = basename(input)
     kofamout_path = joinpath(outdir, namae * ".kofam.tblout")
-    kofamout = Kofamout(kofamout_path, input, profiledir, ko_list)
-    return Kofamscan(cpu, input, outdir, profiledir, ko_list, kofamout)
+    kofamout = Kofamout(kofamout_path, input, hmmdir, ko_list)
+    return Kofamscan(cpu, input, outdir, hmmdir, ko_list, kofamout)
 end
 
 function Base.run(kofamscan::Kofamscan)

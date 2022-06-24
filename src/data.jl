@@ -20,7 +20,7 @@ end
 struct Kofamout <: AbstractData
     path::String
     query::String
-    profiledir::String
+    hmmdir::String
     ko_list::String
 end
 
