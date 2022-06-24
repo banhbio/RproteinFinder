@@ -26,7 +26,7 @@ struct SeqkitGrep <: AbstractExternalProgram
 end
 
 function SeqkitGrep(input::String, output::String, ids::String, cpu::Int; append=true)
-    cmd = pipeline(`seqkit grep -j $(cpu) -f $(ids) -$(input)`, stdout=output, append = append)
+    cmd = pipeline(`seqkit grep -j $(cpu) -f $(ids) $(input)`, stdout=output, append = append)
     return SeqkitGrep(cmd, input, ids, output, cpu)
 end
 
