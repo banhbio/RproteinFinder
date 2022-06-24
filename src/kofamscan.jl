@@ -2,7 +2,7 @@ struct Kofamscan
     cpu::Int
     input::String
     outdir::String
-    profiledir::String
+    hmmdir::String
     ko_list::String
     result::Kofamout
 end
@@ -17,9 +17,9 @@ end
 function Base.run(kofamscan::Kofamscan)
     tabdir = joinpath(kofamscan.outdir, "tabular")
     mkpath(tabdir)
-    profile_list = parse_ko_list(kofamscan.ko_list, kofamscan.profiledir)
+    profile_list = parse_ko_list(kofamscan.ko_list, kofamscan.hmmdir)
     tblouts = run_hmmsearch(kofamscan.input, tabdir, profile_list, kofamscan.cpu)
-    make_kofamout(kofamscan.result, tblouts)
+    make_kofamout(result(kofamscan), tblouts)
 end
 
 function run_hmmsearch(input::String, outdir::String, profile_list::Vector{Profile}, cpu::Int) 
