@@ -64,7 +64,7 @@ function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{I
         end
         close(o_tmp)
 
-        seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file)
+        seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
         run(seqkitgrep)
 
         tmpdb_path = joinpath(outdir, basename(taxid_path) * ".db")
