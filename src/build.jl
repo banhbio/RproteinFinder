@@ -19,7 +19,7 @@ function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{I
         end
     end
 
-    build!(kofam_results, outdir)
+    build!(kofam_results, outdir, cpu)
 end
 
 function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, outdir::String, cpu::Int)
@@ -36,7 +36,7 @@ function parsehmmresult(source_path::String, hmmdir::String, ko_list::String, ou
     return kofamout
 end
 
-function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{Int,Int}}}}, outdir::String)
+function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{Int,Int}}}}, outdir::String, cpu::Int)
     fasta_out = joinpath(outdir, "rproteins.fasta")
     taxid_table = joinpath(outdir, "rproteins.taxid")
 
