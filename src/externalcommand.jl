@@ -22,11 +22,12 @@ struct SeqkitGrep <: AbstractExternalProgram
     input::String
     ids::String
     result::String
+    cpu::Int
 end
 
-function SeqkitGrep(input::String, output::String, ids::String; append=true)
-    cmd = pipeline(`seqkit grep -f $(ids) $(input)`, stdout=output, append = append)
-    return SeqkitGrep(cmd, input, ids, output)
+function SeqkitGrep(input::String, output::String, ids::String, cpu::Int; append=true)
+    cmd = pipeline(`seqkit grep -j $(cpu) -f $(ids) -$(input)`, stdout=output, append = append)
+    return SeqkitGrep(cmd, input, ids, output, cpu)
 end
 
 struct MakeBlastDB <: AbstractExternalProgram
