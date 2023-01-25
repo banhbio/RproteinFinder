@@ -1,6 +1,6 @@
 const OneOrVector{T} = Union{T, Vector{T}}
 
-function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{Int,Int}}}}, hmmdir::String, ko_list::String, outdir::String, cpu::Int, fromhmmresult::Bool)
+function builddatabase!(; sources::OneOrVector{Tuple{String, String}}, hmmdir::String, ko_list::String, outdir::String, nodes::String, names::String, cpu::Int, fromhmmresult::Bool)
     if !isa(sources, Vector)        
         sources = [sources]
     end
@@ -19,7 +19,7 @@ function builddatabase!(; sources::OneOrVector{Tuple{String,Tuple{String,Tuple{I
         end
     end
 
-    build!(kofam_results, outdir, cpu)
+    build!(kofam_results, outdir, nodes, names, cpu)
 end
 
 function runkofamscan!(source_path::String, hmmdir::String, ko_list::String, outdir::String, cpu::Int)
@@ -36,7 +36,7 @@ function parsehmmresult(source_path::String, hmmdir::String, ko_list::String, ou
     return kofamout
 end
 
-function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{Int,Int}}}}, outdir::String, cpu::Int)
+function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::String, nodes::String, names::String, cpu::Int)
     fasta_out = joinpath(outdir, "rproteins.fasta")
     taxid_table = joinpath(outdir, "rproteins.taxid")
 
@@ -44,48 +44,39 @@ function build!(kofam_results::Vector{Tuple{String,Kofamout,Tuple{String,Tuple{I
     rm(taxid_table, force=true)
 
     taxid_tmp = taxid_table * ".tmp"
-    o = open(taxid_tmp, "w")
     for result in kofam_results
         source = first(result)
         kofamout = result[2]
-        taxid_pairs = last(result)
-        taxid_path = first(taxid_pairs)
-        col_pair = last(taxid_pairs)
-        accession_col = first(col_pair)
-        taxid_col = last(col_pair)
+        taxid_path = last(result)
 
         kofam_hits = hits(kofamout)
         hit_ids = map(x -> id(x), kofam_hits)
         
         tmp_ids_file = joinpath(outdir, basename(source) * ".hit_id")
-        o_tmp = open(tmp_ids_file, "w")
-        for id in hit_ids
-            write(o_tmp, "$(id)\n")
+        open(tmp_ids_file, "w") do o
+            for id in hit_ids
+                write(o, "$(id)\n")
+            end
         end
-        close(o_tmp)
 
         seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
         run(seqkitgrep)
 
-        tmpdb_path = joinpath(outdir, basename(taxid_path) * ".db")
-        db = SQLite.DB(tmpdb_path)
-        BlastLCA.create!(db, taxid_path; header=false, delim="\t", accession_col=accession_col, taxid_col=taxid_col)
-
-        for hit in hit_ids
-            taxid = get(db, hit, nothing)
-            write(o, "$(hit)\t$(taxid)\n")
+        open(taxid_path, "r") do f; open(taxid_tmp, "w") do o
+            write(o, "accession\ttaxid\n")
+            for line in eachline(f)
+                id, taxid = split(line, "\t") .|> String
+                if id in hit_ids
+                    write(o, "$(hit)\t$(taxid)\n")
+                end
+            end
         end
-        rm(tmpdb_path)
     end
-    close(o)
 
     rm_duprow(taxid_tmp, taxid_table)
 
-    makeblastdb = MakeBlastDB(fasta_out)
+    makeblastdb = MakeBlastDB(fasta_out, taxid_table, nodes, names)
     run(makeblastdb)
-    
-    new_db = SQLite.DB(taxid_table * ".db")
-    BlastLCA.create!(new_db, taxid_table, header=false, delim="\t", accession_col=1, taxid_col=2)
 end
 
 function rm_duprow(input::String, output::String)
