@@ -1,7 +1,6 @@
 module RproteinFinder
 using BlastLCA
 using Taxonomy
-using SQLite
 using FASTX
 using JSON
 
