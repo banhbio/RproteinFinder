@@ -51,7 +51,7 @@ struct Blast <: AbstractExternalProgram
 end
 
 function Blast(input::String, db::String, output::String, evalue::Float64, cpu::Int)
-    cmd = `diamond blastp --db $(db) --query $(input) --outfmt 6 --threads $(cpu) --evalue $(evalue) -k 500 --out $(output)`
+    cmd = `diamond blastp --db $(db) --query $(input) --outfmt 6 qseqid sseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore staxids --threads $(cpu) --evalue $(evalue) -k 500 --out $(output)`
     blastout = Blastout(output, input, db)
     return Blast(cmd, cpu, input, db, blastout)
 end
