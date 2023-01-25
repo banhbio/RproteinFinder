@@ -36,8 +36,8 @@ struct MakeBlastDB <: AbstractExternalProgram
     result::String
 end
 
-function MakeBlastDB(input::String)
-    cmd = `diamond makedb --in $(input) -d $(input)`
+function MakeBlastDB(input::String, taxonmap::String, nodes_path::String, names_path::String)
+    cmd = `diamond makedb --in $(input) -d $(input) --taxonmap $(taxonmap) --taxonnodes $(nodes_path) --taxonnames $(names_path)`
     result = input * ".db"
     return MakeBlastDB(cmd, input, result)
 end
