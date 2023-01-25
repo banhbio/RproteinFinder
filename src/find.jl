@@ -12,7 +12,7 @@ function findrproteins(;query::String, output::String, tempdir::String, ko_list:
     hits_path = joinpath(tempdir, "hits.fasta")
     open(FASTA.Reader, query) do reader; open(FASTA.Writer, hits_path) do o
         kofamhits = hits(kofamout)
-        hit_ids = map(x -> id(x), kofamhits)
+        hit_ids = id.(kofamhits)
         hit_record = [record for record in reader if in(identifier(record), hit_ids)]
         map(x -> write(o, x), hit_record)
     end;end
