@@ -29,6 +29,11 @@ function parse_commandline()
             arg_type = AbstractString
             required = true
 
+        "--taxonomy_db"
+            help = "taxonomy database (directory where nodes.dmp and names.dmp)"
+            arg_type = AbstractString
+            required = true
+
         "--outdir"
             help = "output directory"
             arg_type = AbstractString
@@ -57,6 +62,11 @@ function main()
     @assert isfile(parsed_args["ko_list"])
     ko_list = abspath(parsed_args["ko_list"])
 
+    @assert isdir(realpath(parsed_args["taxonomy_db"]))
+    taxonomy_db = abspath(parsed_args["taxonomy_db"])
+
+    nodes, names = joinpath.(taxonomy_db, ["nodes.dmp","names.dmp"])
+
     outdir = abspath(parsed_args["outdir"])
 
     fromhmmresult = parsed_args["fromhmmresult"]
@@ -69,6 +79,8 @@ function main()
                                      hmmdir=hmmdir,
                                      ko_list=ko_list,
                                      outdir=outdir,
+                                     nodes=nodes,
+                                     names=names,
                                      cpu=thread,
                                      fromhmmresult=fromhmmresult)
 end
