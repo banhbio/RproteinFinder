@@ -48,11 +48,6 @@ function parse_commandline()
             help = "taxonomy database (directory where nodes.dmp and names.dmp)"
             arg_type = AbstractString
             required = true
-        
-        "--seq2taxonomy_db"
-            help = "seq2taxonomy seqlite database"
-            arg_type = AbstractString
-            required = true
     end
 
     return parse_args(s)
@@ -85,8 +80,7 @@ function main()
     tempdir = abspath(parsed_args["tempdir"])
     output = abspath(parsed_args["output"])
 
-    taxonomy = Taxonomy.DB(taxonomy_db, "nodes.dmp","names.dmp")
-    sqlite = SQLite.DB(seq2taxonomy_db)
+    taxonomy = Taxonomy.DB(joinpath.(taxonomy_db, ["nodes.dmp","names.dmp"])...)
 
     minimal = 0.9
     cutoff = 0.8
@@ -107,7 +101,6 @@ function main()
                                 ko_list=ko_list,
                                 db_path=db,
                                 taxonomy=taxonomy,
-                                taxid_db=sqlite,
                                 hmmdir=hmmdir,
                                 cpu=thread,
                                 blastlca_minimal=minimal,
