@@ -15,7 +15,7 @@ function parse_commandline()
             default = 1
         
         "--input"
-            help = "input file .json format"
+            help = "input file (--input fasta1,taxonmap1 fasta2,taxonmap2 ...)"
             arg_type = AbstractString
             required = true
 
@@ -61,7 +61,7 @@ function main()
 
     fromhmmresult = parsed_args["fromhmmresult"]
 
-    sources = RproteinFinder.parse_input(input)
+    sources = Tuple.(split(split(input), ","))
 
     @info "Parsed args:" input hmmdir ko_list outdir
 
