@@ -70,7 +70,7 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
                     write(o, "$(hit)\t$(taxid)\n")
                 end
             end
-        end
+        end; end
     end
 
     rm_duprow(taxid_tmp, taxid_table)
