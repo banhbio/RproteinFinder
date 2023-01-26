@@ -53,8 +53,6 @@ function main()
     thread = parsed_args["thread"]
     @assert thread > 0
 
-    @assert isfile(parsed_args["input"])
-
     @assert isdir(parsed_args["hmmdir"])
     hmmdir = abspath(parsed_args["hmmdir"])
 
