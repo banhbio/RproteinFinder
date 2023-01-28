@@ -63,7 +63,6 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
         run(seqkitgrep)
 
         open(taxid_path, "r") do f; open(taxid_tmp, "w") do o
-            write(o, "accession.version\ttaxid\n")
             for line in eachline(f)
                 id, taxid = split(line, "\t") .|> String
                 if id in hit_ids
@@ -80,6 +79,7 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
 end
 
 function rm_duprow(input::String, output::String)
-    cmd = pipeline(pipeline(`cat $(input)`, `sort`, `uniq`), stdout=output)
+    run(pipeline(`echo "accession.version\ttaxid\n`, stdout=output))
+    cmd = pipeline(pipeline(`cat $(input)`, `sort`, `uniq`), stdout=output, append=true)
     run(cmd)
 end
