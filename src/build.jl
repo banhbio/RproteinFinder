@@ -80,7 +80,7 @@ end
 
 function rm_duprow(input::String, output::String)
     open(output, "w") do o
-        write(o, "accession.version\taxid\n")
+        write(o, "accession.version\ttaxid\n")
     end
     cmd = pipeline(pipeline(`cat $(input)`, `sort`, `uniq`), stdout=output, append=true)
     run(cmd)
