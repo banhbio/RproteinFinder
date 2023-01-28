@@ -67,7 +67,7 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
             for line in eachline(f)
                 id, taxid = split(line, "\t") .|> String
                 if id in hit_ids
-                    write(o, "$(hit)\t$(taxid)\n")
+                    write(o, "$(id)\t$(taxid)\n")
                 end
             end
         end; end
