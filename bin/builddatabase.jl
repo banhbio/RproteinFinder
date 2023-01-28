@@ -53,6 +53,8 @@ function main()
     thread = parsed_args["thread"]
     @assert thread > 0
 
+    input = parsed_args["input"]
+
     @assert isdir(parsed_args["hmmdir"])
     hmmdir = abspath(parsed_args["hmmdir"])
 
@@ -68,7 +70,7 @@ function main()
 
     fromhmmresult = parsed_args["fromhmmresult"]
 
-    sources = Tuple.(split(split(input), ","))
+    sources = Tuple{String, String}.(split(split(input), ","))
 
     @info "Parsed args:" input hmmdir ko_list outdir
 
