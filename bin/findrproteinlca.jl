@@ -1,6 +1,5 @@
 using RproteinFinder
 using Taxonomy
-using SQLite
 
 using Logging
 using ArgParse: ArgParseSettings, parse_args, @add_arg_table
