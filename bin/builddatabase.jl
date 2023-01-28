@@ -69,7 +69,7 @@ function main()
 
     fromhmmresult = parsed_args["fromhmmresult"]
 
-    sources = Tuple{String, String}.(split(split(input), ","))
+    sources = Tuple{String, String}.(split.(split(input), ","))
 
     @info "Parsed args:" input hmmdir ko_list outdir
 
