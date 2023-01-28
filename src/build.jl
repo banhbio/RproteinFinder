@@ -44,6 +44,9 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
     rm(taxid_table, force=true)
 
     taxid_tmp = taxid_table * ".tmp"
+
+    hits = String[]
+
     for result in kofam_results
         source = first(result)
         kofamout = result[2]
@@ -62,15 +65,17 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
         seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
         run(seqkitgrep)
 
-        open(taxid_path, "r") do f; open(taxid_tmp, "w") do o
-            for line in eachline(f)
-                id, taxid = split(line, "\t") .|> String
-                if id in hit_ids
-                    write(o, "$(id)\t$(taxid)\n")
-                end
-            end
-        end; end
+        append!(hits, hit_ids)
     end
+
+    open(taxid_path, "r") do f; open(taxid_tmp, "w") do o
+        for line in eachline(f)
+            id, taxid = split(line, "\t") .|> String
+            if id in hits
+                write(o, "$(id)\t$(taxid)\n")
+            end
+        end
+    end; end
 
     rm_duprow(taxid_tmp, taxid_table)
 
