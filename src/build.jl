@@ -79,7 +79,9 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
 end
 
 function rm_duprow(input::String, output::String)
-    run(pipeline(`echo "accession.version\ttaxid\n"`, stdout=output))
+    open(output, "w") do o
+        write(o, "accession.version\taxid\n")
+    end
     cmd = pipeline(pipeline(`cat $(input)`, `sort`, `uniq`), stdout=output, append=true)
     run(cmd)
 end
