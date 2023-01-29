@@ -15,3 +15,7 @@ Taxonomy = "10bb16a4-4bfc-432e-9419-4ca69c1a753c"
 
 [compat]
 Taxonomy = "0.4"
+CSV = "0.10"
+JSON = "0.21"
+ArgParse = "1"
+FASTX = "2"
