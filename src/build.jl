@@ -45,37 +45,36 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
 
     taxid_tmp = taxid_table * ".tmp"
 
-    hits = String[]
+    open(taxid_tmp, "w") do o
+        for result in kofam_results
+            source = first(result)
+            kofamout = result[2]
+            taxid_path = last(result)
 
-    for result in kofam_results
-        source = first(result)
-        kofamout = result[2]
-        taxid_path = last(result)
-
-        kofam_hits = hits(kofamout)
-        hit_ids = map(x -> id(x), kofam_hits)
+            kofam_hits = hits(kofamout)
+            hit_ids = id.(kofam_hits)
         
-        tmp_ids_file = joinpath(outdir, basename(source) * ".hit_id")
-        open(tmp_ids_file, "w") do o
-            for id in hit_ids
-                write(o, "$(id)\n")
+            tmp_ids_file = joinpath(outdir, basename(source) * ".hit_id")
+            open(tmp_ids_file, "w") do t
+                for id in hit_ids
+                    write(t, "$(id)\n")
+                end
+            end
+
+            seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
+            run(seqkitgrep)
+
+            open(taxid_path, "r") do f
+                for line in eachline(f)
+                    id, taxid = split(line, "\t") .|> String
+                    if id in hits
+                        write(o, "$(id)\t$(taxid)\n")
+                    end
+                end
             end
         end
-
-        seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
-        run(seqkitgrep)
-
-        append!(hits, hit_ids)
     end
 
-    open(taxid_path, "r") do f; open(taxid_tmp, "w") do o
-        for line in eachline(f)
-            id, taxid = split(line, "\t") .|> String
-            if id in hits
-                write(o, "$(id)\t$(taxid)\n")
-            end
-        end
-    end; end
 
     rm_duprow(taxid_tmp, taxid_table)
 
