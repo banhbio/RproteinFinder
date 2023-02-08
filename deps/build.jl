@@ -1,0 +1,1 @@
+using RproteinFinder; RproteinFinder.comonicon_install()
