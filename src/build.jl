@@ -64,13 +64,15 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
             seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
             run(seqkitgrep)
 
-            open(taxid_path, "r") do f
-                for line in eachline(f)
-                    id, taxid = split(line, "\t") .|> String
-                    if id in hit_ids
-                        write(o, "$(id)\t$(taxid)\n")
-                    end
-                end
+            id_and_taxids = open(taxid_path, "r") do f
+                readlines(f)
+            end
+
+            taxid_dict = Pair{String, String}.(split.(dbs)...) |> Dict
+
+            for id in hit_ids
+                taxid = taxid_dict[id]
+                write(o, "$(id)\t$(taxid)\n")
             end
         end
     end
