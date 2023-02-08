@@ -30,7 +30,7 @@ make ribosomal protein database from inputs
                     )
     @assert thread > 0
 
-    sources = Tuple{String, String}.(split.(input, ","))
+    sources = Tuple{String, String}.(split.(input, ",")) |> collect
 
     builddatabase!(; sources=sources,
                     hmmdir=hmmdir,
