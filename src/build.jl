@@ -68,7 +68,7 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
                 readlines(f)
             end
 
-            taxid_dict = Pair{String, String}.(split.(dbs)...) |> Dict
+            taxid_dict = Pair{String, String}.(split.(id_and_taxids)...) |> Dict
 
             for id in hit_ids
                 taxid = taxid_dict[id]
