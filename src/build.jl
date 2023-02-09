@@ -43,7 +43,9 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
     rm(fasta_out, force=true)
     rm(taxid_table, force=true)
 
-    taxid_tmp = taxid_table * ".tmp"
+    open(taxid_table, "w") do o
+        write(o, "accession.version\ttaxid\n")
+    end
 
     for result in kofam_results
         source = first(result)
@@ -63,20 +65,10 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
         seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
         run(seqkitgrep)
 
-        cmd =pipeline(`cat $(taxid_path)`, stdout=taxid_tmp, append=true)
+        cmd =pipeline(`cat $(taxid_path)`, stdout=taxid_table, append=true)
         run(cmd)
     end
 
-    rm_duprow(taxid_tmp, taxid_table)
-
     makeblastdb = MakeBlastDB(fasta_out, taxid_table, nodes, names)
     run(makeblastdb)
-end
-
-function rm_duprow(input::String, output::String)
-    open(output, "w") do o
-        write(o, "accession.version\ttaxid\n")
-    end
-    cmd = pipeline(pipeline(`cat $(input)`, `sort`, `uniq`), stdout=output, append=true)
-    run(cmd)
 end
