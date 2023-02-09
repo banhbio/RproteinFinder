@@ -45,38 +45,27 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
 
     taxid_tmp = taxid_table * ".tmp"
 
-    open(taxid_tmp, "w") do o
-        for result in kofam_results
-            source = first(result)
-            kofamout = result[2]
-            taxid_path = last(result)
+    for result in kofam_results
+        source = first(result)
+        kofamout = result[2]
+        taxid_path = last(result)
 
-            kofam_hits = hits(kofamout)
-            hit_ids = id.(kofam_hits)
-        
-            tmp_ids_file = joinpath(outdir, basename(source) * ".hit_id")
-            open(tmp_ids_file, "w") do t
-                for id in hit_ids
-                    write(t, "$(id)\n")
-                end
-            end
-
-            seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
-            run(seqkitgrep)
-
-            id_and_taxids = open(taxid_path, "r") do f
-                readlines(f)
-            end
-
-            taxid_dict = Pair{String, String}.(split.(id_and_taxids)...) |> Dict
-
+        kofam_hits = hits(kofamout)
+        hit_ids = id.(kofam_hits)
+       
+        tmp_ids_file = joinpath(outdir, basename(source) * ".hit_id")
+        open(tmp_ids_file, "w") do t
             for id in hit_ids
-                taxid = taxid_dict[id]
-                write(o, "$(id)\t$(taxid)\n")
+                write(t, "$(id)\n")
             end
         end
-    end
 
+        seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
+        run(seqkitgrep)
+
+        cmd =pipeline(`cat $(taxid_path)`, stdout=taxid_tmp, append=true)
+        run(cmd)
+    end
 
     rm_duprow(taxid_tmp, taxid_table)
 
