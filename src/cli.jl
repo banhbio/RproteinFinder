@@ -54,16 +54,12 @@ find ribosomal protein in the input
 - `-t, --threads <int>`: is thread used in running external programs
 - `--hmmdir <path>`: is the path to the hmm profile directory
 - `--ko-list <path>`: is the path to the ko_list.txt file
-- `--nodes-file <path>`: is the path to the nodes file
-- `--names-file <path>`: is the path to the names file
 - `--output <path>`: is the path to the output directory
 - `--tempdir <path>`: is the path to the temp directory
 - `--diamond-db <path>`: is the path to the diamond database directory
 """
 @cast function find(input;
                     thread::Int=1,
-                    nodes_file=nothing,
-                    names_file=nothing,
                     hmmdir=nothing,
                     ko_list=nothing,
                     diamond_db=nothing,
