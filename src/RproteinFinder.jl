@@ -1,6 +1,4 @@
 module RproteinFinder
-using BlastLCA
-using Taxonomy
 using FASTX
 
 include("data.jl")

@@ -80,30 +80,14 @@ find ribosomal protein in the input
     tempdir = abspath(tempdir)
     output = abspath(output)
 
-    taxonomy = Taxonomy.DB(nodes_file, names_file)
-
-    minimal = 0.9
-    cutoff = 0.8
-    ranks =[:superkingdom, :phylum, :class, :order, :family, :genus, :species]
-    precision = Dict{Symbol, Float64}(
-               :class => 0.50,
-               :order => 0.65,
-               :family => 0.80,
-               :genus => 0.95,
-               :species => 1.0)
-
     RproteinFinder.findrproteins(;query=input,
                                 output=output,
                                 tempdir=tempdir,
                                 ko_list=ko_list,
-                                db_path=db,
-                                taxonomy=taxonomy,
+                                db_path=diamond_db,
                                 hmmdir=hmmdir,
-                                cpu=thread,
-                                blastlca_minimal=minimal,
-                                blastlca_cutoff=cutoff,
-                                blastlca_ranks=ranks,
-                                blastlca_precision=precision)
+                                cpu=thread
+                                )
 end
 
 """

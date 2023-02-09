@@ -1,1 +1,1 @@
-using RproteinFinder, BlastLCA, Taxonomy, Comonicon
+using RproteinFinder, FASTX, Comonicon
