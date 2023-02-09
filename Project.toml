@@ -12,5 +12,6 @@ Taxonomy = "10bb16a4-4bfc-432e-9419-4ca69c1a753c"
 
 [compat]
 CSV = "0.10"
+Comonicon = "1"
 FASTX = "2"
 Taxonomy = "0.4"
