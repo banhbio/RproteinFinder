@@ -68,8 +68,6 @@ find ribosomal protein in the input
                     )
     @assert thread > 0
     input = abspath(input)
-    nodes_file=abspath(nodes_file)
-    names_file=abspath(names_file)
     hmmdir = abspath(hmmdir)
     ko_list = abspath(ko_list)
     diamond_db=abspath(diamond_db)
