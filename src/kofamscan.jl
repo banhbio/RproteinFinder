@@ -23,16 +23,12 @@ function Base.run(kofamscan::Kofamscan)
 end
 
 function run_hmmsearch(input::String, outdir::String, profile_list::Vector{Profile}, cpu::Int) 
-    tblouts = Tblout[]
-    for profile in profile_list
-        namae = basename(path(profile))
-        output = joinpath(outdir, namae)
-        hmmsearch = Hmmsearch(input, profile, output, 1e-05, cpu)
-        run(hmmsearch)
-        tblout = result(hmmsearch)
-        push!(tblouts, tblout)
-    end
-    return tblouts
+    profile_tmp = joinpath(outdir, "profile_tmp.hmm")
+    output = joinpath(outdir, "hmmer.tblout")
+    hmmsearch = Hmmsearch(input, profile_list, profile_tmp, output, 1e-05, cpu)
+    run(hmmsearch)
+    tblout = result(hmmsearch)
+    return tblout
 end
 
 function parse_ko_list(ko_list::String, profile_dir::String)
@@ -46,7 +42,7 @@ function parse_ko_list(ko_list::String, profile_dir::String)
             type = row[3]
 
             path = joinpath(profile_dir, knum * ".hmm")
-            profile = Profile(path, type, threshold)
+            profile = Profile(path, knum, type, threshold)
             push!(profile_list, profile)
         end
     end
