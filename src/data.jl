@@ -13,7 +13,6 @@ end
 
 struct Profile <: AbstractData
     path::String
-    name::String
     type::String
     threshold::Float64
 end
@@ -56,33 +55,24 @@ end
 struct Tblout <: AbstractData
     path::String
     query::String
-    profile_list::Vector{Profile}
+    profile::Profile
 end
 
 function kofamhits(tblout::Tblout)
     hit_list = KofamResult[]
+    profile = tblout.profile
+    if profile.type == "full"
+        score_row = 6
+    else
+        score_row = 9
+    end
 
-    profile_dict = map(tblout.profile_list) do profile
-        Pair(profile.name, profile)
-    end |> Dict
-
-    open(path(tblout), "r") do f 
-
+    open(path(tblout), "r") do f
         for l in eachline(f)
             l[1] == '#' ? continue : nothing
             rows = split(l, r" +")
-
             id = rows[1]
             ko = rows[3]
-        
-            profile = profile_dict[ko]
-
-            if profile.type == "full"
-                score_row = 6
-            else
-                score_row = 9
-            end
-        
             score = parse(Float64, rows[score_row])
             evalue = parse(Float64, rows[score_row-1])
             if score >= profile.threshold

@@ -11,13 +11,10 @@ struct Hmmsearch <: AbstractExternalProgram
     result::Tblout
 end
 
-function Hmmsearch(input::String, profile_list::Vector{Profile}, profile_tmp::String, output::String, evalue::Float64, cpu::Int)
-    all_path = path.(profile_list)
-    cmd1 = `cat $(all_path)`
-    run(pipeline(cmd1, stdout=profile_tmp))
-    cmd2 = `hmmsearch --cpu $(cpu) --tblout $(output) -E $(evalue) $(profile_tmp) $(input)`
-    tblout = Tblout(output, input, profile_list)
-    return Hmmsearch(cmd2, cpu, input, profile, tblout)
+function Hmmsearch(input::String, profile::Profile, output::String, evalue::Float64, cpu::Int)
+    cmd = `hmmsearch --cpu $(cpu) --tblout $(output) -E $(evalue) $(path(profile)) $(input)`
+    tblout = Tblout(output, input, profile)
+    return Hmmsearch(cmd, cpu, input, profile, tblout)
 end
 
 struct SeqkitGrep <: AbstractExternalProgram
