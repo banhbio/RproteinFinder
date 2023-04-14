@@ -7,7 +7,7 @@ struct Hmmsearch <: AbstractExternalProgram
     cmd::Base.AbstractCmd
     cpu::Int
     input::String
-    profile_list::Vector{Profile}
+    profile::Profile
     result::Tblout
 end
 
@@ -17,7 +17,7 @@ function Hmmsearch(input::String, profile_list::Vector{Profile}, profile_tmp::St
     run(pipeline(cmd1, stdout=profile_tmp))
     cmd2 = `hmmsearch --cpu $(cpu) --tblout $(output) -E $(evalue) $(profile_tmp) $(input)`
     tblout = Tblout(output, input, profile_list)
-    return Hmmsearch(cmd2, cpu, input, profile_list, tblout)
+    return Hmmsearch(cmd2, cpu, input, profile, tblout)
 end
 
 struct SeqkitGrep <: AbstractExternalProgram
