@@ -23,26 +23,19 @@ function Base.run(kofamscan::Kofamscan)
 end
 
 function run_hmmsearch(input::String, outdir::String, profile_list::Vector{Profile}, cpu::Int) 
-    chnl = Channel{Tblout}(cpu)
     len = length(profile_list)
+    tblouts = Vector{Tblout}[]
     
-    t = @async for i in 1:len
+    Threads.@threads for i in 1:len
         profile = profile_list[i]
         namae = basename(path(profile))
         output = joinpath(outdir, namae)
         hmmsearch = Hmmsearch(input, profile, output, 1e-05, 1)
         run(hmmsearch)
         tblout = result(hmmsearch)
-        put!(chnl, tblout)
+        tblouts[i] = tblout
     end
 
-    tblouts = Tblout[]
-    while true
-        tbl = take!(chnl)
-        push!(tablouts, tbl)
-    end
-    wait(t)
-    close(chnl)
     return tblouts
 end
 

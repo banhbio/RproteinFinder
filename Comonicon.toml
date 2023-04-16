@@ -4,6 +4,7 @@ name = "rproteinfinder"
 completion = true
 quiet = false
 optimize = 2
+nthreads = 16
 
 [sysimg]
 incremental=false
