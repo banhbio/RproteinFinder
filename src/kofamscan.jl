@@ -24,7 +24,7 @@ end
 
 function run_hmmsearch(input::String, outdir::String, profile_list::Vector{Profile}, cpu::Int) 
     len = length(profile_list)
-    tblouts = Vector{Tblout}[]
+    tblouts = Vector{Tblout}(undef, len)
     
     Threads.@threads for i in 1:len
         profile = profile_list[i]
