@@ -65,7 +65,7 @@ function build!(kofam_results::Vector{Tuple{String, Kofamout, String}}, outdir::
         seqkitgrep = SeqkitGrep(source, fasta_out, tmp_ids_file, cpu)
         run(seqkitgrep)
 
-        cmd =pipeline(`cat $(taxid_path)`, stdout=taxid_table, append=true)
+        cmd =pipeline(`sed '1d' $(taxid_path)`, stdout=taxid_table, append=true)
         run(cmd)
     end
 
